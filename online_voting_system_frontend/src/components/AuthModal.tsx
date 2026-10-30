@@ -11,8 +11,6 @@ export const AuthModal: React.FC = () => {
   const [gateway, setGateway] = useState<'voter' | 'admin'>('voter');
   // Inside the 1 voter page, toggle between Sign In and Register
   const [voterAction, setVoterAction] = useState<'signin' | 'register'>('signin');
-  // Inside the admin page, toggle between Sign In and Register
-  const [adminAction, setAdminAction] = useState<'signin' | 'register'>('signin');
 
   // Unified Form Inputs
   const [fullName, setFullName] = useState('');
@@ -158,71 +156,37 @@ export const AuthModal: React.FC = () => {
     setStatusMsg(null);
 
     try {
-      if (adminAction === 'register') {
-        const generatedAdminEpic = 'IND-ADM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-        try {
-          const res = await apiService.adminSignUp({
-            fullName,
-            dob,
-            email,
-            password
-          });
-
-          const signinRes = await apiService.signIn({ email, password }).catch(() => null);
-
-          const adminUser = {
-            id: (signinRes && signinRes.id) || res.id || 1,
-            email: (signinRes && signinRes.email) || res.email || email,
-            fullName: (signinRes && signinRes.fullName) || res.fullName || fullName,
-            epicNumber: (signinRes && signinRes.epicNumber) || res.epicNumber || generatedAdminEpic,
-            constituency: 'National Parliamentary HQ',
-            role: 'ROLE_ADMIN' as const,
-            isVerified: true
-          };
-          setAuth(adminUser, (signinRes && signinRes.token) || 'admin_jwt_token');
-        } catch (err: any) {
-          throw new Error(err.message || 'Admin registration failed');
-        }
-
-        setStatusMsg({ type: 'success', text: 'Administrator registered successfully! Accessing Admin Console...' });
-        confetti({ particleCount: 70, spread: 50 });
-        setTimeout(() => {
-          closeAuthModal();
-          setActiveTab('admin');
-        }, 1000);
-      } else {
-        try {
-          const res = await apiService.signIn({ email: email || 'admin@eci.gov.in', password });
-          const adminUser = {
-            id: res.id || 1,
-            email: res.email || email,
-            fullName: res.fullName || 'System Administrator',
-            epicNumber: res.epicNumber || 'IND-ADM00001',
-            constituency: 'National Parliamentary HQ',
-            role: 'ROLE_ADMIN' as const,
-            isVerified: true
-          };
-          setAuth(adminUser, res.token || 'admin_jwt_token');
-        } catch {
-          const adminUser = {
-            id: 1,
-            email: email || 'admin@eci.gov.in',
-            fullName: 'System Administrator',
-            epicNumber: 'IND-ADM00001',
-            constituency: 'National Parliamentary HQ',
-            role: 'ROLE_ADMIN' as const,
-            isVerified: true
-          };
-          setAuth(adminUser, 'mock_admin_token');
-        }
-
-        setStatusMsg({ type: 'success', text: 'Admin authority verified. Accessing Admin Center...' });
-        confetti({ particleCount: 70, spread: 50 });
-        setTimeout(() => {
-          closeAuthModal();
-          setActiveTab('admin');
-        }, 1000);
+      try {
+        const res = await apiService.signIn({ email: email || 'admin@eci.gov.in', password });
+        const adminUser = {
+          id: res.id || 1,
+          email: res.email || email,
+          fullName: res.fullName || 'System Administrator',
+          epicNumber: res.epicNumber || 'IND-ADM00001',
+          constituency: 'National Parliamentary HQ',
+          role: 'ROLE_ADMIN' as const,
+          isVerified: true
+        };
+        setAuth(adminUser, res.token || 'admin_jwt_token');
+      } catch {
+        const adminUser = {
+          id: 1,
+          email: email || 'admin@eci.gov.in',
+          fullName: 'System Administrator',
+          epicNumber: 'IND-ADM00001',
+          constituency: 'National Parliamentary HQ',
+          role: 'ROLE_ADMIN' as const,
+          isVerified: true
+        };
+        setAuth(adminUser, 'mock_admin_token');
       }
+
+      setStatusMsg({ type: 'success', text: 'Admin authority verified. Accessing Admin Center...' });
+      confetti({ particleCount: 70, spread: 50 });
+      setTimeout(() => {
+        closeAuthModal();
+        setActiveTab('admin');
+      }, 1000);
     } catch (err: any) {
       setStatusMsg({ type: 'error', text: err.message || 'Admin authentication failed' });
     } finally {
@@ -382,43 +346,22 @@ export const AuthModal: React.FC = () => {
           </div>
         )}
 
-        {/* If Admin Gateway: Toggle between Sign In and Register */}
+        {/* If Admin Gateway: Dedicated Secure Authority Login */}
         {gateway === 'admin' && (
-          <div style={{ display: 'flex', gap: '0.4rem', background: 'rgba(255,255,255,0.02)', padding: '0.25rem', borderRadius: '8px', marginBottom: '1.2rem' }}>
-            <button
-              type="button"
-              onClick={() => { setAdminAction('signin'); setStatusMsg(null); }}
-              style={{
-                flex: 1,
-                background: adminAction === 'signin' ? 'rgba(239, 68, 68, 0.25)' : 'transparent',
-                color: adminAction === 'signin' ? '#f87171' : 'var(--text-muted)',
-                border: 'none',
-                padding: '0.45rem',
-                borderRadius: '6px',
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                cursor: 'pointer'
-              }}
-            >
-              Admin Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => { setAdminAction('register'); setStatusMsg(null); }}
-              style={{
-                flex: 1,
-                background: adminAction === 'register' ? 'rgba(239, 68, 68, 0.25)' : 'transparent',
-                color: adminAction === 'register' ? '#f87171' : 'var(--text-muted)',
-                border: 'none',
-                padding: '0.45rem',
-                borderRadius: '6px',
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                cursor: 'pointer'
-              }}
-            >
-              Admin Register
-            </button>
+          <div style={{
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            padding: '0.6rem 0.8rem',
+            borderRadius: '8px',
+            marginBottom: '1.2rem',
+            fontSize: '0.8rem',
+            color: '#fca5a5',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
+            <Key size={16} color="#f87171" />
+            <span>Authorized Election Commission Personnel Only</span>
           </div>
         )}
 
@@ -544,49 +487,8 @@ export const AuthModal: React.FC = () => {
             </button>
           </form>
         ) : (
-          /* Admin Form (Sign In & Register) */
+          /* Admin Form (Sign In) */
           <form onSubmit={handleAdminAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {adminAction === 'register' && (
-              <>
-                {/* 1. Admin Full Name */}
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
-                    Administrator Full Name *
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <User size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-dim)' }} />
-                    <input 
-                      type="text" 
-                      required
-                      placeholder="e.g. Chief Election Officer"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="input-control"
-                      style={{ paddingLeft: '2.5rem' }}
-                    />
-                  </div>
-                </div>
-
-                {/* 2. Admin Date of Birth */}
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
-                    Date of Birth (DOB) *
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <Calendar size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-dim)' }} />
-                    <input 
-                      type="date" 
-                      required
-                      value={dob}
-                      onChange={(e) => setDob(e.target.value)}
-                      className="input-control"
-                      style={{ paddingLeft: '2.5rem' }}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
                 Admin Official Email *
@@ -623,12 +525,6 @@ export const AuthModal: React.FC = () => {
               </div>
             </div>
 
-            {adminAction === 'register' && (
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
-                🛡️ Administrator privileges (ROLE_ADMIN) and Official Admin Identification (IND-ADM) will be assigned.
-              </div>
-            )}
-
             <button 
               type="submit" 
               disabled={loading}
@@ -639,9 +535,7 @@ export const AuthModal: React.FC = () => {
                 background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)'
               }}
             >
-              {loading 
-                ? 'Processing...' 
-                : (adminAction === 'register' ? 'Register Administrator Account' : 'Access Admin Console')}
+              {loading ? 'Processing...' : 'Access Admin Console'}
             </button>
           </form>
         )}

@@ -313,23 +313,15 @@ export const apiService = {
     return await res.json();
   },
 
-  async adminSignUp(data: { fullName: string; dob?: string; email: string; password: string }) {
-    const payload = {
-      fullName: data.fullName,
-      dob: data.dob || '1990-01-01',
-      email: data.email,
-      password: data.password
-    };
-    const res = await fetch(`${API_BASE}/auth/admin/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || 'Admin registration failed');
+  async signOut(): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/auth/signout`, {
+        method: 'POST'
+      });
+      return res.ok;
+    } catch {
+      return true;
     }
-    return await res.json();
   },
 
   async signIn(data: { email: string; password: string }) {

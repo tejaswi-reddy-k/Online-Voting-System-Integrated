@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -26,10 +28,9 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/admin/signup")
-    public ResponseEntity<SignupResponse> adminSignUp(@Valid @RequestBody SignupRequest request) {
-        SignupResponse response = userService.signUpAdmin(request);
-        return ResponseEntity.ok(response);
+    @PostMapping("/signout")
+    public ResponseEntity<Map<String, String>> signOut() {
+        return ResponseEntity.ok(Map.of("message", "User signed out successfully. Token cleared."));
     }
 
     @PostMapping("/signin")
