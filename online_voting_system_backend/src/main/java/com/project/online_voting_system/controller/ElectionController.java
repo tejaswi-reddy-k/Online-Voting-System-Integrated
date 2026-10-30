@@ -56,12 +56,24 @@ public class ElectionController {
 
     @GetMapping(value = "/public/stream-results/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamResults(@PathVariable Long id) {
-        return electionService.subscribeToResults(id);
+        try {
+            return electionService.subscribeToResults(id);
+        } catch (Exception e) {
+            SseEmitter emitter = new SseEmitter(10000L);
+            emitter.complete();
+            return emitter;
+        }
     }
 
     @GetMapping(value = "/public/stream-all", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamAllResults() {
-        return electionService.subscribeToAllResults();
+        try {
+            return electionService.subscribeToAllResults();
+        } catch (Exception e) {
+            SseEmitter emitter = new SseEmitter(10000L);
+            emitter.complete();
+            return emitter;
+        }
     }
 
     // Admin operations

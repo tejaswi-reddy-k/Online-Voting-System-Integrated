@@ -15,8 +15,18 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(org.springframework.web.HttpMediaTypeNotAcceptableException.class)
+    public ResponseEntity<String> handleMediaTypeNotAcceptable() {
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("");
+    }
+
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
+    public ResponseEntity<?> handleRuntimeException(RuntimeException ex, jakarta.servlet.http.HttpServletRequest request) {
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains(org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE)) {
+            return ResponseEntity.status(HttpStatus.OK).contentType(org.springframework.http.MediaType.TEXT_EVENT_STREAM).build();
+        }
+
         HttpStatus status = HttpStatus.BAD_REQUEST;
         String msg = ex.getMessage();
 

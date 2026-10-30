@@ -252,7 +252,17 @@ public class ElectionService {
     }
 
     public SseEmitter subscribeToResults(Long electionId) {
-        ElectionResultResponse currentResults = getElectionResults(electionId);
+        Election election = electionRepository.findById(electionId).orElse(null);
+        if (election == null) {
+            List<Election> all = electionRepository.findAll();
+            if (!all.isEmpty()) {
+                election = all.get(0);
+                electionId = election.getId();
+            }
+        }
+        ElectionResultResponse currentResults = (election != null)
+                ? getElectionResults(election.getId())
+                : createEmptyResults(electionId);
         return electionStreamService.subscribe(electionId, currentResults);
     }
 
@@ -264,7 +274,11 @@ public class ElectionService {
     }
 
     public ElectionResultResponse getElectionResults(Long electionId) {
-        Election election = getElectionById(electionId);
+        Election election = electionRepository.findById(electionId).orElse(null);
+        if (election == null) {
+            return createEmptyResults(electionId);
+        }
+
         List<Candidate> candidates = candidateRepository.findByElectionId(electionId);
         long totalVotes = candidates.stream().mapToLong(Candidate::getVoteCount).sum();
 
@@ -285,6 +299,16 @@ public class ElectionService {
         response.setResultsAnnounced(election.isResultsAnnounced());
         response.setResults(candidateResults);
 
+        return response;
+    }
+
+    private ElectionResultResponse createEmptyResults(Long electionId) {
+        ElectionResultResponse response = new ElectionResultResponse();
+        response.setElectionId(electionId != null ? electionId : 0L);
+        response.setTitle("Election Results Pending");
+        response.setTotalVotes(0);
+        response.setResultsAnnounced(false);
+        response.setResults(List.of());
         return response;
     }
 
