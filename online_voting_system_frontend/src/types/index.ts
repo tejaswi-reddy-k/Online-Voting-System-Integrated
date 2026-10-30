@@ -55,6 +55,32 @@ export interface CandidateRegistration {
   party: string;
   manifesto: string;
   photoUrl: string;
+  paymentTransactionId?: string;
+  securityDepositAmount?: number;
+}
+
+export interface PaymentOrder {
+  orderId: string;
+  amount: number;
+  currency: string;
+  electionId: number;
+  electionTitle: string;
+  candidateName: string;
+  createdAt: string;
+  status: string;
+}
+
+export interface PaymentReceipt {
+  transactionId: string;
+  orderId: string;
+  amount: number;
+  currency: string;
+  status: string;
+  paymentMethod: string;
+  treasuryReference: string;
+  timestamp: string;
+  candidateEmail: string;
+  description: string;
 }
 
 export interface VoteReceipt {

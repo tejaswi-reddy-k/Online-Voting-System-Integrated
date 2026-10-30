@@ -60,6 +60,7 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/api/elections/public/**",
                                 "/api/voters/verify-ballot/**",
+                                "/api/payments/receipt/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",

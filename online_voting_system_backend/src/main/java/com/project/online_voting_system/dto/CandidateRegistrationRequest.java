@@ -18,6 +18,10 @@ public class CandidateRegistrationRequest {
 
     private String photoUrl;
 
+    private String paymentTransactionId;
+
+    private Double securityDepositAmount = 25000.00;
+
     public CandidateRegistrationRequest() {
     }
 
@@ -27,6 +31,16 @@ public class CandidateRegistrationRequest {
         this.party = party;
         this.manifesto = manifesto;
         this.photoUrl = photoUrl;
+    }
+
+    public CandidateRegistrationRequest(Long electionId, String name, String party, String manifesto, String photoUrl, String paymentTransactionId, Double securityDepositAmount) {
+        this.electionId = electionId;
+        this.name = name;
+        this.party = party;
+        this.manifesto = manifesto;
+        this.photoUrl = photoUrl;
+        this.paymentTransactionId = paymentTransactionId;
+        this.securityDepositAmount = securityDepositAmount != null ? securityDepositAmount : 25000.00;
     }
 
     public Long getElectionId() {
@@ -67,5 +81,21 @@ public class CandidateRegistrationRequest {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
+    }
+
+    public String getPaymentTransactionId() {
+        return paymentTransactionId;
+    }
+
+    public void setPaymentTransactionId(String paymentTransactionId) {
+        this.paymentTransactionId = paymentTransactionId;
+    }
+
+    public Double getSecurityDepositAmount() {
+        return securityDepositAmount;
+    }
+
+    public void setSecurityDepositAmount(Double securityDepositAmount) {
+        this.securityDepositAmount = securityDepositAmount;
     }
 }

@@ -77,5 +77,22 @@ public class EmailService {
                 + "Certified by the Independent Digital Ledger and Election Commission.";
         sendEmail(to, "Official Election Results: " + electionTitle + " - Winner: " + winnerName, body);
     }
+
+    public void sendPaymentReceiptEmail(String to, String candidateName, String transactionId, double amount, String electionTitle) {
+        String body = "Official Candidate Security Deposit Receipt\n"
+                + "========================================\n"
+                + "Dear " + candidateName + ",\n\n"
+                + "Your statutory electoral security deposit payment has been successfully cleared by the Treasury Gateway.\n\n"
+                + "Payment Summary:\n"
+                + "----------------------------------------\n"
+                + "• Nominated Candidate: " + candidateName + "\n"
+                + "• Election: " + electionTitle + "\n"
+                + "• Security Deposit Amount: ₹" + String.format("%.2f", amount) + " INR\n"
+                + "• Transaction Reference: " + transactionId + "\n"
+                + "• Status: CLEARED & AUDITED\n\n"
+                + "Your candidacy nomination papers have been admitted for balloting.\n\n"
+                + "Election Commission Authority";
+        sendEmail(to, "Electoral Security Deposit Cleared - " + transactionId, body);
+    }
 }
 

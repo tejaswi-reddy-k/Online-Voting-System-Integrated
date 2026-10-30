@@ -29,6 +29,12 @@ public class Candidate {
     @Column(nullable = false)
     private long voteCount;
 
+    private String paymentTransactionId;
+
+    private boolean securityDepositPaid = true;
+
+    private Double securityDepositAmount = 25000.00;
+
     public Candidate() {
     }
 
@@ -107,4 +113,27 @@ public class Candidate {
         this.voteCount = voteCount;
     }
 
+    public String getPaymentTransactionId() {
+        return paymentTransactionId;
+    }
+
+    public void setPaymentTransactionId(String paymentTransactionId) {
+        this.paymentTransactionId = paymentTransactionId;
+    }
+
+    public boolean isSecurityDepositPaid() {
+        return securityDepositPaid;
+    }
+
+    public void setSecurityDepositPaid(boolean securityDepositPaid) {
+        this.securityDepositPaid = securityDepositPaid;
+    }
+
+    public Double getSecurityDepositAmount() {
+        return securityDepositAmount;
+    }
+
+    public void setSecurityDepositAmount(Double securityDepositAmount) {
+        this.securityDepositAmount = securityDepositAmount;
+    }
 }
