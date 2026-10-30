@@ -12,11 +12,16 @@ public class PaymentOrderResponse {
     private String candidateName;
     private LocalDateTime createdAt;
     private String status;
+    private String razorpayKeyId;
 
     public PaymentOrderResponse() {
     }
 
     public PaymentOrderResponse(String orderId, Double amount, String currency, Long electionId, String electionTitle, String candidateName, LocalDateTime createdAt, String status) {
+        this(orderId, amount, currency, electionId, electionTitle, candidateName, createdAt, status, null);
+    }
+
+    public PaymentOrderResponse(String orderId, Double amount, String currency, Long electionId, String electionTitle, String candidateName, LocalDateTime createdAt, String status, String razorpayKeyId) {
         this.orderId = orderId;
         this.amount = amount;
         this.currency = currency;
@@ -25,6 +30,7 @@ public class PaymentOrderResponse {
         this.candidateName = candidateName;
         this.createdAt = createdAt;
         this.status = status;
+        this.razorpayKeyId = razorpayKeyId;
     }
 
     public String getOrderId() {
@@ -89,5 +95,13 @@ public class PaymentOrderResponse {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getRazorpayKeyId() {
+        return razorpayKeyId;
+    }
+
+    public void setRazorpayKeyId(String razorpayKeyId) {
+        this.razorpayKeyId = razorpayKeyId;
     }
 }

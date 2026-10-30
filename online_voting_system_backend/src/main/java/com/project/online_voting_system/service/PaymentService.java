@@ -8,6 +8,7 @@ import com.project.online_voting_system.model.Election;
 import com.project.online_voting_system.model.User;
 import com.project.online_voting_system.repository.ElectionRepository;
 import com.project.online_voting_system.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,15 @@ public class PaymentService {
     private final ElectionRepository electionRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+
+    @Value("${razorpay.key.id:rzp_test_YourKeyIdHere}")
+    private String razorpayKeyId;
+
+    @Value("${razorpay.key.secret:YourKeySecretHere}")
+    private String razorpayKeySecret;
+
+    @Value("${razorpay.currency:INR}")
+    private String razorpayCurrency;
 
     // In-memory payment orders registry
     private final Map<String, PaymentOrderResponse> pendingOrders = new ConcurrentHashMap<>();
@@ -52,12 +62,13 @@ public class PaymentService {
         PaymentOrderResponse order = new PaymentOrderResponse(
                 orderId,
                 amount,
-                "INR",
+                razorpayCurrency != null ? razorpayCurrency : "INR",
                 request.getElectionId(),
                 electionTitle,
                 candidateName,
                 LocalDateTime.now(),
-                "CREATED"
+                "CREATED",
+                razorpayKeyId
         );
 
         pendingOrders.put(orderId, order);

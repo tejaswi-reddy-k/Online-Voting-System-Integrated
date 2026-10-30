@@ -68,6 +68,7 @@ export interface PaymentOrder {
   candidateName: string;
   createdAt: string;
   status: string;
+  razorpayKeyId?: string;
 }
 
 export interface PaymentReceipt {
