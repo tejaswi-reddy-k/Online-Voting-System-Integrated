@@ -150,7 +150,7 @@ public class ElectionService {
                 : "TXN-SEC-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         candidate.setPaymentTransactionId(txnId);
         candidate.setSecurityDepositPaid(true);
-        candidate.setSecurityDepositAmount(request.getSecurityDepositAmount() != null ? request.getSecurityDepositAmount() : 25000.00);
+        candidate.setSecurityDepositAmount(request.getSecurityDepositAmount() != null ? request.getSecurityDepositAmount() : 25.00);
 
         return candidateRepository.save(candidate);
     }

@@ -38,7 +38,7 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
 
   const activeElection = elections.find(e => e.id === selectedElectionId) || elections[0];
   const activeElectionId = activeElection ? activeElection.id : 1;
-  const depositAmount = 25000; // ECI Statutory Deposit (₹25,000)
+  const depositAmount = 25; // Candidate Nomination Security Deposit (₹25)
 
   // Move from nomination details to payment gateway
   const handleProceedToPayment = (e: React.FormEvent) => {
@@ -373,7 +373,7 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
                   background: declarationChecked ? 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' : 'rgba(255,255,255,0.1)'
                 }}
               >
-                <span>Proceed to Statutory Security Deposit (₹25,000)</span>
+                <span>Proceed to Statutory Security Deposit (₹25)</span>
                 <ArrowRight size={18} />
               </button>
             </form>

@@ -33,7 +33,7 @@ public class Candidate {
 
     private boolean securityDepositPaid = true;
 
-    private Double securityDepositAmount = 25000.00;
+    private Double securityDepositAmount = 25.00;
 
     public Candidate() {
     }

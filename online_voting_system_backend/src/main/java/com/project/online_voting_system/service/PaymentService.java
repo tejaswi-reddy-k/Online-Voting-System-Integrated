@@ -57,7 +57,7 @@ public class PaymentService {
                 : (user != null ? user.getFullName() : "Nominated Elector");
 
         String orderId = "ORDER-NOM-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        Double amount = (request.getAmount() != null && request.getAmount() > 0) ? request.getAmount() : 25000.00;
+        Double amount = (request.getAmount() != null && request.getAmount() > 0) ? request.getAmount() : 25.00;
 
         PaymentOrderResponse order = new PaymentOrderResponse(
                 orderId,
@@ -83,7 +83,7 @@ public class PaymentService {
         PaymentOrderResponse order = pendingOrders.get(request.getOrderId());
         Double amount = (request.getAmount() != null && request.getAmount() > 0)
                 ? request.getAmount()
-                : (order != null ? order.getAmount() : 25000.00);
+                : (order != null ? order.getAmount() : 25.00);
 
         String electionTitle = order != null ? order.getElectionTitle() : "General Parliamentary Election";
         User user = userRepository.findByEmail(userEmail).orElse(null);
@@ -136,7 +136,7 @@ public class PaymentService {
         return new PaymentReceiptResponse(
                 transactionId,
                 "ORDER-NOM-STATUTORY",
-                25000.00,
+                25.00,
                 "INR",
                 "SUCCESS",
                 "ONLINE_TREASURY_GATEWAY",

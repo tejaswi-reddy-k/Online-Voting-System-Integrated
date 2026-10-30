@@ -20,7 +20,7 @@ public class CandidateRegistrationRequest {
 
     private String paymentTransactionId;
 
-    private Double securityDepositAmount = 25000.00;
+    private Double securityDepositAmount = 25.00;
 
     public CandidateRegistrationRequest() {
     }
@@ -40,7 +40,7 @@ public class CandidateRegistrationRequest {
         this.manifesto = manifesto;
         this.photoUrl = photoUrl;
         this.paymentTransactionId = paymentTransactionId;
-        this.securityDepositAmount = securityDepositAmount != null ? securityDepositAmount : 25000.00;
+        this.securityDepositAmount = securityDepositAmount != null ? securityDepositAmount : 25.00;
     }
 
     public Long getElectionId() {

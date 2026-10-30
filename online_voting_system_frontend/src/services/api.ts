@@ -401,7 +401,7 @@ export const apiService = {
     } catch {
       return {
         orderId: 'ORDER-NOM-' + Math.random().toString(36).substring(2, 9).toUpperCase(),
-        amount: data.amount || 25000,
+        amount: data.amount || 25,
         currency: 'INR',
         electionId: data.electionId,
         electionTitle: 'Democracy Election 2026',
