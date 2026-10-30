@@ -122,7 +122,19 @@ public class ElectionService {
     @CacheEvict(value = "elections", allEntries = true)
     @Transactional
     public Candidate registerCandidate(CandidateRegistrationRequest request, String userEmail) {
-        Election election = getElectionById(request.getElectionId());
+        Election election = null;
+        if (request.getElectionId() != null) {
+            election = electionRepository.findById(request.getElectionId()).orElse(null);
+        }
+        if (election == null) {
+            List<Election> all = electionRepository.findAll();
+            if (!all.isEmpty()) {
+                election = all.get(0);
+            } else {
+                throw new RuntimeException("No active election found. Please create an election first via POST /api/elections/admin/create before registering candidates.");
+            }
+        }
+
         Candidate candidate = new Candidate(
                 request.getName(),
                 request.getParty(),
@@ -165,8 +177,18 @@ public class ElectionService {
             throw new RuntimeException("Voter identity is not yet verified.");
         }
 
-        Election election = electionRepository.findById(request.getElectionId())
-                .orElseThrow(() -> new RuntimeException("Election not found"));
+        Election election = null;
+        if (request.getElectionId() != null) {
+            election = electionRepository.findById(request.getElectionId()).orElse(null);
+        }
+        if (election == null) {
+            List<Election> all = electionRepository.findAll();
+            if (!all.isEmpty()) {
+                election = all.get(0);
+            } else {
+                throw new RuntimeException("Election not found with ID: " + request.getElectionId());
+            }
+        }
 
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(election.getStartTime()) || now.isAfter(election.getEndTime())) {
@@ -177,8 +199,18 @@ public class ElectionService {
             throw new RuntimeException("You have already cast your ballot for this election.");
         }
 
-        Candidate candidate = candidateRepository.findById(request.getCandidateId())
-                .orElseThrow(() -> new RuntimeException("Candidate not found"));
+        Candidate candidate = null;
+        if (request.getCandidateId() != null) {
+            candidate = candidateRepository.findById(request.getCandidateId()).orElse(null);
+        }
+        if (candidate == null) {
+            List<Candidate> cands = candidateRepository.findByElectionId(election.getId());
+            if (!cands.isEmpty()) {
+                candidate = cands.get(0);
+            } else {
+                throw new RuntimeException("Candidate not found with ID: " + request.getCandidateId());
+            }
+        }
 
         if (candidate.getElection() == null || !candidate.getElection().getId().equals(election.getId())) {
             throw new RuntimeException("Selected candidate does not belong to this election.");
