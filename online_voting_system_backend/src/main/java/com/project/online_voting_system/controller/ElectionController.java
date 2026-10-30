@@ -30,6 +30,16 @@ public class ElectionController {
         return ResponseEntity.ok(electionService.getPublishedElections());
     }
 
+    @GetMapping("/public/all")
+    public ResponseEntity<List<Election>> getAllPublicElections() {
+        return ResponseEntity.ok(electionService.getAllElections());
+    }
+
+    @GetMapping("/public/{id}")
+    public ResponseEntity<Election> getElectionById(@PathVariable Long id) {
+        return ResponseEntity.ok(electionService.getElectionById(id));
+    }
+
     @GetMapping("/public/results/{id}")
     public ResponseEntity<ElectionResultResponse> getResults(@PathVariable Long id) {
         return ResponseEntity.ok(electionService.getElectionResults(id));
@@ -47,6 +57,11 @@ public class ElectionController {
     @GetMapping(value = "/public/stream-results/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamResults(@PathVariable Long id) {
         return electionService.subscribeToResults(id);
+    }
+
+    @GetMapping(value = "/public/stream-all", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamAllResults() {
+        return electionService.subscribeToAllResults();
     }
 
     // Admin operations

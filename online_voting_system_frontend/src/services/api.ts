@@ -213,6 +213,36 @@ export const apiService = {
     return await res.json();
   },
 
+  async getCandidates(): Promise<Candidate[]> {
+    try {
+      const res = await fetch(`${API_BASE}/candidates`);
+      if (!res.ok) throw new Error('Failed to fetch candidates');
+      return await res.json();
+    } catch {
+      return [];
+    }
+  },
+
+  async getCandidateById(candidateId: number): Promise<Candidate | null> {
+    try {
+      const res = await fetch(`${API_BASE}/candidates/${candidateId}`);
+      if (!res.ok) throw new Error('Candidate not found');
+      return await res.json();
+    } catch {
+      return null;
+    }
+  },
+
+  async getCandidatesByElection(electionId: number): Promise<Candidate[]> {
+    try {
+      const res = await fetch(`${API_BASE}/candidates/election/${electionId}`);
+      if (!res.ok) throw new Error('Failed to fetch election candidates');
+      return await res.json();
+    } catch {
+      return [];
+    }
+  },
+
   async deleteCandidate(candidateId: number, token: string): Promise<boolean> {
     const res = await fetch(`${API_BASE}/candidates/${candidateId}`, {
       method: 'DELETE',
@@ -271,6 +301,10 @@ export const apiService = {
 
   getStreamResultsUrl(electionId: number): string {
     return `${API_BASE}/elections/public/stream-results/${electionId}`;
+  },
+
+  getStreamAllResultsUrl(): string {
+    return `${API_BASE}/elections/public/stream-all`;
   },
 
   async getElectionResults(electionId: number): Promise<ElectionResults | null> {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { ElectionCard } from './ElectionCard';
+import { HomeLiveVoteStream } from './HomeLiveVoteStream';
 import type { Election, ElectionStatus } from '../types';
 import { getElectionStatus } from '../types';
 import { 
@@ -110,6 +111,9 @@ export const HomePage: React.FC<HomePageProps> = ({ elections: propElections }) 
           </div>
         </div>
       </div>
+
+      {/* Real-Time Vote Stream on Home Page */}
+      <HomeLiveVoteStream elections={elections} />
 
       {/* FILTER TABS: UPCOMING, ONGOING, COMPLETED */}
       <div style={{

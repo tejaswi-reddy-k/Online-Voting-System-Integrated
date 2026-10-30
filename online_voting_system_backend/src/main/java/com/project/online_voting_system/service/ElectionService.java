@@ -142,6 +142,19 @@ public class ElectionService {
         candidateRepository.deleteById(candidateId);
     }
 
+    public Candidate getCandidateById(Long candidateId) {
+        return candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new RuntimeException("Candidate not found with ID: " + candidateId));
+    }
+
+    public List<Candidate> getCandidatesByElectionId(Long electionId) {
+        return candidateRepository.findByElectionId(electionId);
+    }
+
+    public List<Candidate> getAllCandidates() {
+        return candidateRepository.findAll();
+    }
+
     @CacheEvict(value = "elections", allEntries = true)
     @Transactional
     public VoteReceiptResponse castVote(VoteRequest request, String userEmail) {

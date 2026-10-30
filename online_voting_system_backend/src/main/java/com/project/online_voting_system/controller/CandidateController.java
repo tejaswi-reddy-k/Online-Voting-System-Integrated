@@ -33,6 +33,30 @@ public class CandidateController {
     }
 
     /**
+     * View candidate by ID
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Candidate> getCandidateById(@PathVariable Long id) {
+        return ResponseEntity.ok(electionService.getCandidateById(id));
+    }
+
+    /**
+     * View all candidates nominated for a specific election
+     */
+    @GetMapping("/election/{electionId}")
+    public ResponseEntity<java.util.List<Candidate>> getCandidatesByElectionId(@PathVariable Long electionId) {
+        return ResponseEntity.ok(electionService.getCandidatesByElectionId(electionId));
+    }
+
+    /**
+     * View all candidates
+     */
+    @GetMapping
+    public ResponseEntity<java.util.List<Candidate>> getAllCandidates() {
+        return ResponseEntity.ok(electionService.getAllCandidates());
+    }
+
+    /**
      * Admin operation to withdraw / delete a candidate
      */
     @DeleteMapping("/{id}")

@@ -65,6 +65,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/error"
                         ).permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/candidates/**", "/api/candidates").permitAll()
                         .requestMatchers("/api/elections/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
