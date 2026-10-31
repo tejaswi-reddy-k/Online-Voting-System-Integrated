@@ -1,6 +1,6 @@
 import type { Election, VoteReceipt, ElectionResults, CandidateRegistration, Candidate, PaymentOrder, PaymentReceipt } from '../types';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export function getAuthHeaders(token?: string): Record<string, string> {
   if (token && token.trim() !== '' && !token.startsWith('mock_') && !token.includes('_jwt_token')) {

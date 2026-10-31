@@ -31,7 +31,8 @@ public class Candidate {
 
     private String paymentTransactionId;
 
-    private boolean securityDepositPaid = true;
+    @Column(name = "security_deposit_paid", nullable = true)
+    private Boolean securityDepositPaid = true;
 
     private Double securityDepositAmount = 25.00;
 
@@ -121,11 +122,11 @@ public class Candidate {
         this.paymentTransactionId = paymentTransactionId;
     }
 
-    public boolean isSecurityDepositPaid() {
+    public Boolean isSecurityDepositPaid() {
         return securityDepositPaid;
     }
 
-    public void setSecurityDepositPaid(boolean securityDepositPaid) {
+    public void setSecurityDepositPaid(Boolean securityDepositPaid) {
         this.securityDepositPaid = securityDepositPaid;
     }
 
