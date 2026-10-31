@@ -562,7 +562,7 @@ export const AuthModal: React.FC = () => {
           </form>
         )}
 
-        {/* Demo Fast Fill Buttons */}
+        {/* Fast Fill Profiles */}
         <div style={{
           marginTop: '1.2rem',
           padding: '0.8rem',
@@ -572,7 +572,10 @@ export const AuthModal: React.FC = () => {
           fontSize: '0.72rem',
           color: 'var(--text-muted)'
         }}>
-          <div style={{ fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.3rem' }}>Quick One-Click Test Profiles:</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+            <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>One-Click Test Profiles:</span>
+            <span style={{ color: '#4ade80', fontSize: '0.68rem', fontWeight: 600 }}>Multiple Voters Supported ✓</span>
+          </div>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
             <button 
               type="button"
@@ -584,7 +587,19 @@ export const AuthModal: React.FC = () => {
               }}
               style={{ background: 'rgba(249, 115, 22, 0.15)', color: '#fb923c', border: '1px solid rgba(249,115,22,0.3)', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
             >
-              Fill Voter (voter@gmail.com)
+              Voter 1 (voter@gmail.com)
+            </button>
+            <button 
+              type="button"
+              onClick={() => {
+                setGateway('voter');
+                setVoterAction('signin');
+                setEmail('voter2@gmail.com');
+                setPassword('Tejaswi@123');
+              }}
+              style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid rgba(56,189,248,0.3)', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              Voter 2 (voter2@gmail.com)
             </button>
             <button 
               type="button"
@@ -595,7 +610,7 @@ export const AuthModal: React.FC = () => {
               }}
               style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
             >
-              Fill Admin (admin@gmail.com)
+              Sole Admin (admin@gmail.com)
             </button>
           </div>
         </div>

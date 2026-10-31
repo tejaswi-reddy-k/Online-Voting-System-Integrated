@@ -97,6 +97,7 @@ interface AppStore {
   updateElection: (id: number, updated: Partial<Election>) => void;
   deleteElection: (id: number) => void;
   addCandidate: (electionId: number, candidate: Candidate) => void;
+  updateCandidate: (electionId: number, candidateId: number, updated: Partial<Candidate>) => void;
   deleteCandidate: (electionId: number, candidateId: number) => void;
   recordVote: (electionId: number, candidateId: number) => void;
 
@@ -185,6 +186,21 @@ export const useStore = create<AppStore>((set) => ({
         return {
           ...el,
           candidates: [...cands.filter(c => c.id !== candidate.id), candidate]
+        };
+      }
+      return el;
+    });
+    localStorage.setItem('voting_elections', JSON.stringify(updatedList));
+    return { elections: updatedList };
+  }),
+
+  updateCandidate: (electionId, candidateId, updated) => set((state) => {
+    const updatedList = state.elections.map((el) => {
+      if (el.id === electionId) {
+        const cands = el.candidates || [];
+        return {
+          ...el,
+          candidates: cands.map(c => c.id === candidateId ? { ...c, ...updated } : c)
         };
       }
       return el;

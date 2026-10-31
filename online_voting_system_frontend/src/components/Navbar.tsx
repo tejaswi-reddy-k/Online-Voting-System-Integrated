@@ -167,7 +167,7 @@ export const Navbar: React.FC = () => {
               }}
             >
               <Award size={16} color="#fb923c" />
-              <span>Contest / Nominate Candidate</span>
+              <span>Candidates (Add • View • Edit • Exit)</span>
             </button>
           )}
 

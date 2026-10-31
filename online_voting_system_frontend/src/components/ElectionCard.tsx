@@ -5,7 +5,8 @@ import type { Election, Candidate } from '../types';
 import { getElectionStatus } from '../types';
 import { 
   CheckCircle2, Calendar, AlertTriangle, ArrowRight, 
-  MapPin, Radio, Award, BarChart3, Clock, ShieldCheck, Mail, Trophy, Sparkles
+  MapPin, Radio, Award, BarChart3, Clock, ShieldCheck, Mail, Trophy, Sparkles,
+  Edit3, LogOut
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -18,7 +19,7 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
     user, isAuthenticated, token, 
     activeReceipt, setActiveReceipt, setActiveTab, setSelectedElectionId,
     openAuthModal, addVoteHistory, recordVote, addEmailNotification, openEmailModal,
-    setElections 
+    setElections, deleteCandidate 
   } = useStore();
 
   const [selectedCandidateId, setSelectedCandidateId] = useState<number | null>(null);
@@ -29,6 +30,18 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
   const [resultsEmailSent, setResultsEmailSent] = useState(false);
 
   const status = getElectionStatus(election);
+
+  const handleExitFromCard = async (e: React.MouseEvent, candId: number, candName: string) => {
+    e.stopPropagation();
+    if (!window.confirm(`Withdraw "${candName}" and exit from this election? This candidate will be removed from the ballot.`)) return;
+    try {
+      if (token) await apiService.deleteCandidate(candId, token);
+    } catch {
+      // offline fallback
+    }
+    deleteCandidate(election.id, candId);
+    apiService.getElections().then(data => { if (data && data.length > 0) setElections(data); }).catch(() => {});
+  };
 
   // Compute vote totals and winner for completed elections
   const candidates = election.candidates || [];
@@ -552,28 +565,28 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
       {/* ONGOING / UPCOMING: EVM Electronic Ballot Unit for Candidates */}
       {status !== 'COMPLETED' && (
         <div style={{ marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc' }}>
               Nominated Candidates & Electronic Ballot Unit ({candidates.length}):
             </h4>
-            {status === 'UPCOMING' && (
-              <button 
-                onClick={() => setActiveTab('candidate-register')}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#fb923c',
-                  fontSize: '0.82rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.3rem',
-                  fontWeight: 600
-                }}
-              >
-                <Award size={14} /> Register as Candidate
-              </button>
-            )}
+            <button 
+              onClick={() => setActiveTab('candidate-register')}
+              style={{
+                background: 'rgba(249, 115, 22, 0.12)',
+                border: '1px solid rgba(249, 115, 22, 0.35)',
+                color: '#fb923c',
+                fontSize: '0.8rem',
+                padding: '0.3rem 0.75rem',
+                borderRadius: '7px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontWeight: 700
+              }}
+            >
+              <Award size={14} /> Candidates Hub (Add • View • Edit • Exit)
+            </button>
           </div>
 
           <div style={{
@@ -635,10 +648,59 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
                     </p>
                   </div>
 
-                  <div style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.7rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.7rem', borderTop: '1px solid rgba(255,255,255,0.05)', flexWrap: 'wrap', gap: '0.5rem' }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
                       Candidate #{candidate.id} • {candidate.voteCount || 0} votes
                     </span>
+
+                    {/* Candidate Management Controls: Edit & Exit */}
+                    {isAuthenticated && (
+                      <div style={{ display: 'flex', gap: '0.3rem' }}>
+                        <button
+                          type="button"
+                          title="Edit Candidate Profile"
+                          onClick={(e) => { e.stopPropagation(); setActiveTab('candidate-register'); }}
+                          style={{
+                            background: 'rgba(56, 189, 248, 0.12)',
+                            border: '1px solid rgba(56, 189, 248, 0.3)',
+                            color: '#38bdf8',
+                            padding: '0.2rem 0.45rem',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.2rem',
+                            fontSize: '0.68rem',
+                            fontWeight: 700
+                          }}
+                        >
+                          <Edit3 size={11} />
+                          <span>Edit</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          title="Withdraw and Exit Election"
+                          onClick={(e) => handleExitFromCard(e, candidate.id, candidate.name)}
+                          style={{
+                            background: 'rgba(239, 68, 68, 0.12)',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            color: '#f87171',
+                            padding: '0.2rem 0.45rem',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.2rem',
+                            fontSize: '0.68rem',
+                            fontWeight: 700
+                          }}
+                        >
+                          <LogOut size={11} />
+                          <span>Exit</span>
+                        </button>
+                      </div>
+                    )}
 
                     {status === 'ONGOING' && (
                       <div style={{

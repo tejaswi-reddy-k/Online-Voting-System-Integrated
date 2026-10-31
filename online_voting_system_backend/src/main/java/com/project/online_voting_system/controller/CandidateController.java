@@ -60,15 +60,32 @@ public class CandidateController {
     }
 
     /**
-     * Admin operation to withdraw / delete a candidate
+     * Candidate or Admin operation to withdraw / exit from the election
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Map<String, String>> deleteCandidate(
             @PathVariable Long id,
             Authentication authentication
     ) {
-        electionService.deleteCandidate(id, authentication.getName());
-        return ResponseEntity.ok(Map.of("message", "Candidate removed successfully with ID: " + id));
+        String actor = (authentication != null && authentication.getName() != null)
+                ? authentication.getName()
+                : "Candidate / Elector";
+        electionService.deleteCandidate(id, actor);
+        return ResponseEntity.ok(Map.of("message", "Candidate nomination successfully withdrawn / exited from election with ID: " + id));
+    }
+
+    /**
+     * Candidate or Admin operation to edit candidate details
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Candidate> updateCandidate(
+            @PathVariable Long id,
+            @RequestBody CandidateRegistrationRequest request,
+            Authentication authentication
+    ) {
+        String actor = (authentication != null && authentication.getName() != null)
+                ? authentication.getName()
+                : "Candidate / Elector";
+        return ResponseEntity.ok(electionService.updateCandidate(id, request, actor));
     }
 }

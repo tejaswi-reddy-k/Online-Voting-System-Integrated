@@ -171,7 +171,30 @@ public class ElectionService {
 
     @CacheEvict(value = "elections", allEntries = true)
     @Transactional
-    public void deleteCandidate(Long candidateId, String adminEmail) {
+    public Candidate updateCandidate(Long candidateId, CandidateRegistrationRequest request, String actor) {
+        Candidate candidate = getCandidateById(candidateId);
+        if (request.getName() != null && !request.getName().isBlank()) {
+            candidate.setName(request.getName());
+        }
+        if (request.getParty() != null && !request.getParty().isBlank()) {
+            candidate.setParty(request.getParty());
+        }
+        if (request.getManifesto() != null && !request.getManifesto().isBlank()) {
+            candidate.setManifesto(request.getManifesto());
+        }
+        if (request.getPhotoUrl() != null && !request.getPhotoUrl().isBlank()) {
+            candidate.setPhotoUrl(request.getPhotoUrl());
+        }
+        if (request.getElectionId() != null && candidate.getElection() != null && !request.getElectionId().equals(candidate.getElection().getId())) {
+            Election newElection = getElectionById(request.getElectionId());
+            candidate.setElection(newElection);
+        }
+        return candidateRepository.save(candidate);
+    }
+
+    @CacheEvict(value = "elections", allEntries = true)
+    @Transactional
+    public void deleteCandidate(Long candidateId, String actor) {
         voteRepository.deleteByCandidateId(candidateId);
         candidateRepository.deleteById(candidateId);
     }

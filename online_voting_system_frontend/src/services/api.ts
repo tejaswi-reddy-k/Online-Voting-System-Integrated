@@ -260,6 +260,26 @@ export const apiService = {
     return res.ok;
   },
 
+  async updateCandidate(
+    candidateId: number,
+    data: { name?: string; party?: string; manifesto?: string; photoUrl?: string; electionId?: number },
+    token: string
+  ): Promise<Candidate> {
+    const res = await fetch(`${API_BASE}/candidates/${candidateId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(token)
+      },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to update candidate');
+    }
+    return await res.json();
+  },
+
   async castVote(electionId: number, candidateId: number, token: string): Promise<VoteReceipt> {
     try {
       const res = await fetch(`${API_BASE}/voters/vote`, {
