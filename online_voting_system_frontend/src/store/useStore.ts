@@ -4,13 +4,24 @@ import { MOCK_ELECTIONS } from '../services/api';
 
 const INITIAL_EMAILS: EmailNotification[] = [
   {
-    id: 'email-welcome-01',
+    id: 'email-welcome-voter',
     type: 'REGISTRATION',
     to: 'voter@gmail.com',
     subject: 'Welcome to Secure E-Voting Portal - Registered Elector',
     preview: 'Your citizen voting account is verified and ready for participation.',
-    body: `Official Voter Registration Confirmation\n========================================\nDear Elector,\n\nWelcome to the Secure Online Voting System. Your digital credentials have been verified on the electoral registry.\n\n• Identity Status: VERIFIED ELECTOR\n• System Audit: Cryptographically Secured (SHA-256)\n\nYou can now review live elections, evaluate candidate manifestos, and cast your democratic ballot.\n\nElection Commission Authority`,
-    timestamp: new Date().toISOString()
+    body: `Official Voter Registration Confirmation\n========================================\nDear Elector (voter@gmail.com),\n\nWelcome to the Secure Online Voting System. Your digital credentials have been verified on the electoral registry.\n\n• Identity Status: VERIFIED ELECTOR\n• System Audit: Cryptographically Secured (SHA-256)\n\nYou can now review live elections, evaluate candidate manifestos, and cast your democratic ballot.\n\nElection Commission Authority`,
+    timestamp: new Date().toISOString(),
+    read: false
+  },
+  {
+    id: 'email-welcome-admin',
+    type: 'REGISTRATION',
+    to: 'admin@gmail.com',
+    subject: 'ECI Chief Administrator Official Portal Authorization',
+    preview: 'Official administrative access granted for managing National Elections.',
+    body: `Official Administrator Portal Credentials\n========================================\nDear Chief Administrator (admin@gmail.com),\n\nYour account has been granted full administrative credentials for the National Electronic Voting Infrastructure.\n\n• Role: CHIEF ELECTION ADMINISTRATOR\n• Security Scope: ELECTION CREATION, EDITING, AUDITING & RESULTS MANAGEMENT\n• Protocol: Digital Audit Ledger & Live Stream Synchronization\n\nElection Commission Authority`,
+    timestamp: new Date().toISOString(),
+    read: false
   }
 ];
 
@@ -32,7 +43,20 @@ function getStoredEmails(): EmailNotification[] {
     const raw = localStorage.getItem('voting_emails');
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const normalized: EmailNotification[] = parsed.map((e: any) => ({
+          ...e,
+          to: e.to ? e.to.toLowerCase() : 'voter@gmail.com',
+          read: typeof e.read === 'boolean' ? e.read : false
+        }));
+
+        const hasVoterWelcome = normalized.some((e: any) => e.to === 'voter@gmail.com');
+        const hasAdminWelcome = normalized.some((e: any) => e.to === 'admin@gmail.com');
+        const extras: EmailNotification[] = [];
+        if (!hasVoterWelcome) extras.push(INITIAL_EMAILS[0]);
+        if (!hasAdminWelcome) extras.push(INITIAL_EMAILS[1]);
+        return [...extras, ...normalized];
+      }
     }
   } catch {
     // fallback
@@ -78,6 +102,8 @@ interface AppStore {
 
   // Email Notifications:
   addEmailNotification: (notification: Omit<EmailNotification, 'id' | 'timestamp'>) => void;
+  markEmailAsRead: (id: string) => void;
+  markAllEmailsAsRead: (userEmail?: string) => void;
 }
 
 export const useStore = create<AppStore>((set) => ({
@@ -205,9 +231,30 @@ export const useStore = create<AppStore>((set) => ({
     const newEmail: EmailNotification = {
       ...notification,
       id: 'email-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      read: notification.read !== undefined ? notification.read : false
     };
     const updated = [newEmail, ...state.emailNotifications];
+    localStorage.setItem('voting_emails', JSON.stringify(updated));
+    return { emailNotifications: updated };
+  }),
+
+  markEmailAsRead: (id) => set((state) => {
+    const updated = state.emailNotifications.map(email =>
+      email.id === id ? { ...email, read: true } : email
+    );
+    localStorage.setItem('voting_emails', JSON.stringify(updated));
+    return { emailNotifications: updated };
+  }),
+
+  markAllEmailsAsRead: (userEmail) => set((state) => {
+    const target = userEmail?.toLowerCase();
+    const updated = state.emailNotifications.map(email => {
+      if (!target || email.to.toLowerCase() === target) {
+        return { ...email, read: true };
+      }
+      return email;
+    });
     localStorage.setItem('voting_emails', JSON.stringify(updated));
     return { emailNotifications: updated };
   })

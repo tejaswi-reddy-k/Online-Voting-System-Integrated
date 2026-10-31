@@ -19,6 +19,7 @@ export interface EmailNotification {
   preview: string;
   body: string;
   timestamp: string;
+  read?: boolean;
 }
 
 export interface AuthState {

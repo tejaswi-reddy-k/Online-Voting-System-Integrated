@@ -5,6 +5,11 @@ import { Vote, Radio, Search, LogOut, CheckCircle2, ShieldAlert, Award, UserPlus
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout, activeTab, setActiveTab, openAuthModal, emailNotifications, openEmailModal } = useStore();
 
+  const userEmails = user?.email
+    ? emailNotifications.filter(e => e.to.toLowerCase() === user.email.toLowerCase())
+    : [];
+  const unreadCount = userEmails.filter(e => !e.read).length;
+
   return (
     <header style={{
       position: 'sticky',
@@ -197,9 +202,9 @@ export const Navbar: React.FC = () => {
           <button
             onClick={openEmailModal}
             style={{
-              background: 'rgba(56, 189, 248, 0.12)',
-              color: '#38bdf8',
-              border: '1px solid rgba(56, 189, 248, 0.35)',
+              background: unreadCount > 0 ? 'rgba(249, 115, 22, 0.15)' : 'rgba(56, 189, 248, 0.12)',
+              color: unreadCount > 0 ? '#fb923c' : '#38bdf8',
+              border: unreadCount > 0 ? '1px solid rgba(249, 115, 22, 0.4)' : '1px solid rgba(56, 189, 248, 0.35)',
               padding: '0.45rem 0.85rem',
               borderRadius: '8px',
               cursor: 'pointer',
@@ -209,20 +214,34 @@ export const Navbar: React.FC = () => {
               fontSize: '0.82rem',
               fontWeight: 700
             }}
-            title="View Dispatched Email Notifications"
+            title={user ? `User Inbox for ${user.email} (${unreadCount} unread)` : "View Email Notifications"}
           >
             <Mail size={15} />
             <span>Emails</span>
-            <span style={{
-              background: '#38bdf8',
-              color: '#000000',
-              fontSize: '0.68rem',
-              fontWeight: 900,
-              padding: '0.05rem 0.45rem',
-              borderRadius: '9999px'
-            }}>
-              {emailNotifications.length}
-            </span>
+            {user ? (
+              <span style={{
+                background: unreadCount > 0 ? '#f97316' : '#38bdf8',
+                color: '#000000',
+                fontSize: '0.68rem',
+                fontWeight: 900,
+                padding: '0.05rem 0.45rem',
+                borderRadius: '9999px',
+                boxShadow: unreadCount > 0 ? '0 0 8px rgba(249, 115, 22, 0.6)' : 'none'
+              }}>
+                {unreadCount > 0 ? `${unreadCount} new` : userEmails.length}
+              </span>
+            ) : (
+              <span style={{
+                background: 'rgba(255, 255, 255, 0.15)',
+                color: '#cbd5e1',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                padding: '0.05rem 0.45rem',
+                borderRadius: '9999px'
+              }}>
+                0
+              </span>
+            )}
           </button>
 
           {isAuthenticated && user ? (
