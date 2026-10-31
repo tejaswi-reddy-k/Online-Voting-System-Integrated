@@ -14,7 +14,7 @@ interface CandidateRegisterProps {
 }
 
 export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess }) => {
-  const { user, token, isAuthenticated, openAuthModal, setActiveTab, elections, addCandidate, addEmailNotification } = useStore();
+  const { user, token, isAuthenticated, openAuthModal, setActiveTab, elections, setElections, addCandidate, addEmailNotification } = useStore();
   const [selectedElectionId, setSelectedElectionId] = useState<number>(elections[0]?.id || 1);
   const [candidateName, setCandidateName] = useState(user?.fullName || '');
   const [party, setParty] = useState('');
@@ -84,8 +84,23 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
 
       setPaymentReceipt(receipt);
 
-      // 3. Register candidate with verified payment reference
-      const newCandidate = {
+      // 3. Register candidate with verified payment reference in backend database
+      let savedCandidate: any = null;
+      try {
+        savedCandidate = await apiService.registerCandidate({
+          electionId: activeElectionId,
+          name: candidateName,
+          party: party || 'Independent Candidate',
+          manifesto: manifesto || `Dedicated to public service, constitutional values, and transparent governance.`,
+          photoUrl: photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+          paymentTransactionId: receipt.transactionId,
+          securityDepositAmount: depositAmount
+        }, token || '');
+      } catch (err: any) {
+        console.warn('Backend candidate registration warning:', err);
+      }
+
+      const enrolledCandidate = savedCandidate || {
         id: Date.now(),
         name: candidateName,
         party: party || 'Independent Candidate',
@@ -94,21 +109,12 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
         voteCount: 0
       };
 
-      addCandidate(activeElectionId, newCandidate);
+      addCandidate(activeElectionId, enrolledCandidate);
 
-      try {
-        await apiService.registerCandidate({
-          electionId: activeElectionId,
-          name: candidateName,
-          party: newCandidate.party,
-          manifesto: newCandidate.manifesto,
-          photoUrl: newCandidate.photoUrl,
-          paymentTransactionId: receipt.transactionId,
-          securityDepositAmount: depositAmount
-        }, token || '');
-      } catch {
-        // Local state preserved
-      }
+      // Re-fetch all elections from database to guarantee local state matches PostgreSQL
+      apiService.getElections().then(data => {
+        if (data && data.length > 0) setElections(data);
+      }).catch(() => {});
 
       // 4. Dispatch In-App Email Notification with Treasury Receipt Details
       if (user?.email) {
@@ -117,7 +123,7 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
           to: user.email,
           subject: `Candidacy Nomination & Security Deposit Cleared - ${candidateName}`,
           preview: `Statutory Security Deposit of ₹${depositAmount.toLocaleString()} cleared. Transaction: ${receipt.transactionId}`,
-          body: `Official Candidacy Nomination & Treasury Receipt\n========================================\nDear ${candidateName},\n\nYour nomination papers and statutory electoral security deposit have been officially admitted.\n\nNomination Summary:\n----------------------------------------\n• Candidate: ${candidateName}\n• Affiliation: ${newCandidate.party}\n• Election: ${activeElection?.title || 'Democratic Election'}\n• Security Deposit: ₹${depositAmount.toLocaleString()} INR\n• Transaction ID: ${receipt.transactionId}\n• Treasury Reference: ${receipt.treasuryReference}\n• Payment Mode: ${paymentMethod.toUpperCase()}\n• Status: CONTESTING NOMINEE ON OFFICIAL BALLOT\n\nElection Commission Authority`
+          body: `Official Candidacy Nomination & Treasury Receipt\n========================================\nDear ${candidateName},\n\nYour nomination papers and statutory electoral security deposit have been officially admitted.\n\nNomination Summary:\n----------------------------------------\n• Candidate: ${candidateName}\n• Affiliation: ${enrolledCandidate.party}\n• Election: ${activeElection?.title || 'Democratic Election'}\n• Security Deposit: ₹${depositAmount.toLocaleString()} INR\n• Transaction ID: ${receipt.transactionId}\n• Treasury Reference: ${receipt.treasuryReference}\n• Payment Mode: ${paymentMethod.toUpperCase()}\n• Status: CONTESTING NOMINEE ON OFFICIAL BALLOT\n\nElection Commission Authority`
         });
       }
 

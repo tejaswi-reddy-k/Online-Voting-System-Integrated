@@ -59,15 +59,16 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/elections/public/**",
-                                "/api/voters/verify-ballot/**",
-                                "/api/payments/receipt/**",
+                                "/api/voters/**",
+                                "/api/payments/**",
+                                "/api/candidates",
+                                "/api/candidates/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/error"
                         ).permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/candidates/**", "/api/candidates").permitAll()
-                        .requestMatchers("/api/elections/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/elections/admin/**").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

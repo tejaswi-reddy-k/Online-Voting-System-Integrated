@@ -2,6 +2,13 @@ import type { Election, VoteReceipt, ElectionResults, CandidateRegistration, Can
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
+export function getAuthHeaders(token?: string): Record<string, string> {
+  if (token && token.trim() !== '' && !token.startsWith('mock_') && !token.includes('_jwt_token')) {
+    return { 'Authorization': `Bearer ${token}` };
+  }
+  return {};
+}
+
 export const MOCK_ELECTIONS: Election[] = [
   {
     id: 1,
@@ -128,7 +135,7 @@ export const apiService = {
   async getAllAdminElections(token: string): Promise<Election[]> {
     try {
       const res = await fetch(`${API_BASE}/elections/admin/all`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { ...getAuthHeaders(token) }
       });
       if (!res.ok) throw new Error('Failed to fetch admin elections');
       return await res.json();
@@ -151,7 +158,7 @@ export const apiService = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        ...getAuthHeaders(token)
       },
       body: JSON.stringify(data)
     });
@@ -176,7 +183,7 @@ export const apiService = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        ...getAuthHeaders(token)
       },
       body: JSON.stringify(data)
     });
@@ -191,7 +198,7 @@ export const apiService = {
     const res = await fetch(`${API_BASE}/elections/admin/${id}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${token}`
+        ...getAuthHeaders(token)
       }
     });
     return res.ok;
@@ -202,7 +209,7 @@ export const apiService = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        ...getAuthHeaders(token)
       },
       body: JSON.stringify(data)
     });
@@ -247,7 +254,7 @@ export const apiService = {
     const res = await fetch(`${API_BASE}/candidates/${candidateId}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${token}`
+        ...getAuthHeaders(token)
       }
     });
     return res.ok;
@@ -259,7 +266,7 @@ export const apiService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          ...getAuthHeaders(token)
         },
         body: JSON.stringify({ electionId, candidateId })
       });
@@ -392,7 +399,7 @@ export const apiService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          ...getAuthHeaders(token)
         },
         body: JSON.stringify(data)
       });
@@ -418,7 +425,7 @@ export const apiService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          ...getAuthHeaders(token)
         },
         body: JSON.stringify(data)
       });

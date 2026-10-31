@@ -17,7 +17,8 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
   const { 
     user, isAuthenticated, token, 
     activeReceipt, setActiveReceipt, setActiveTab, setSelectedElectionId,
-    openAuthModal, addVoteHistory, recordVote, addEmailNotification, openEmailModal 
+    openAuthModal, addVoteHistory, recordVote, addEmailNotification, openEmailModal,
+    setElections 
   } = useStore();
 
   const [selectedCandidateId, setSelectedCandidateId] = useState<number | null>(null);
@@ -76,6 +77,11 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
       setHasVoted(true);
       setActiveReceipt(receipt);
       addVoteHistory(receipt);
+
+      // Re-fetch all elections from backend DB so tallies and vote totals match PostgreSQL
+      apiService.getElections().then(data => {
+        if (data && data.length > 0) setElections(data);
+      }).catch(() => {});
 
       // 3. Dispatch Live Email Notification via Backend JavaMailSender
       apiService.sendVoteReceiptEmail(user.email, election.title, candidateName, receipt.ballotHash).catch(() => {});

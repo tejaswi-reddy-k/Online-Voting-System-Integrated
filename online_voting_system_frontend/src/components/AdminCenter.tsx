@@ -11,7 +11,7 @@ import confetti from 'canvas-confetti';
 export const AdminCenter: React.FC = () => {
   const { 
     token, user, setActiveTab, 
-    elections, addElection, updateElection, deleteElection, 
+    elections, setElections, addElection, updateElection, deleteElection, 
     addCandidate, deleteCandidate 
   } = useStore();
 
@@ -108,7 +108,10 @@ export const AdminCenter: React.FC = () => {
       }
 
       setStatusMsg({ type: 'success', text: `Election "${title}" published successfully! Immediately active across all portal pages.` });
-      confetti({ particleCount: 90, spread: 60 });
+      // Re-fetch all elections from database to guarantee local state matches PostgreSQL
+      apiService.getElections().then(data => {
+        if (data && data.length > 0) setElections(data);
+      }).catch(() => {});
 
       // Reset form
       setTitle('');
@@ -162,6 +165,11 @@ export const AdminCenter: React.FC = () => {
       endTime: formattedEnd
     });
 
+    // Re-sync with database
+    apiService.getElections().then(data => {
+      if (data && data.length > 0) setElections(data);
+    }).catch(() => {});
+
     setStatusMsg({ type: 'success', text: `Election #${editingElection.id} updated successfully!` });
     setEditingElection(null);
   };
@@ -180,6 +188,12 @@ export const AdminCenter: React.FC = () => {
     }
 
     deleteElection(id);
+
+    // Re-sync with database
+    apiService.getElections().then(data => {
+      if (data && data.length > 0) setElections(data);
+    }).catch(() => {});
+
     setStatusMsg({ type: 'success', text: `Election #${id} removed from system.` });
   };
 
@@ -211,6 +225,12 @@ export const AdminCenter: React.FC = () => {
     }
 
     addCandidate(selectedElectionForCand, newCandidate);
+
+    // Re-sync with database
+    apiService.getElections().then(data => {
+      if (data && data.length > 0) setElections(data);
+    }).catch(() => {});
+
     setStatusMsg({ type: 'success', text: `Candidate "${candName}" enrolled onto ballot unit!` });
     setCandName('');
     setCandParty('');
@@ -229,6 +249,12 @@ export const AdminCenter: React.FC = () => {
     }
 
     deleteCandidate(electionId, candidateId);
+
+    // Re-sync with database
+    apiService.getElections().then(data => {
+      if (data && data.length > 0) setElections(data);
+    }).catch(() => {});
+
     setStatusMsg({ type: 'success', text: 'Candidate removed from ballot.' });
   };
 

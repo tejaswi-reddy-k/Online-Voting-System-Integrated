@@ -16,17 +16,14 @@ export const App: React.FC = () => {
   const { activeTab, elections, setElections } = useStore();
 
   useEffect(() => {
-    // Only load remote defaults if client has not customized elections in localStorage
-    const stored = localStorage.getItem('voting_elections');
-    if (!stored) {
-      apiService.getElections().then(data => {
-        if (data && data.length > 0) {
-          setElections(data);
-        }
-      }).catch(() => {
-        // keep stored or mock
-      });
-    }
+    // Synchronize with database: always fetch real elections and candidates from PostgreSQL
+    apiService.getElections().then(data => {
+      if (data && data.length > 0) {
+        setElections(data);
+      }
+    }).catch(err => {
+      console.warn('Backend election sync fallback:', err);
+    });
   }, [setElections]);
 
   return (
