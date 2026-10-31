@@ -28,7 +28,7 @@ public class PaymentController {
             @Valid @RequestBody PaymentOrderRequest request,
             Authentication authentication
     ) {
-        String userEmail = authentication != null ? authentication.getName() : "candidate@citizen.in";
+        String userEmail = authentication != null ? authentication.getName() : "voter@gmail.com";
         return ResponseEntity.ok(paymentService.createOrder(request, userEmail));
     }
 
@@ -40,7 +40,7 @@ public class PaymentController {
             @Valid @RequestBody PaymentVerificationRequest request,
             Authentication authentication
     ) {
-        String userEmail = authentication != null ? authentication.getName() : "candidate@citizen.in";
+        String userEmail = authentication != null ? authentication.getName() : "voter@gmail.com";
         return ResponseEntity.ok(paymentService.verifyPayment(request, userEmail));
     }
 

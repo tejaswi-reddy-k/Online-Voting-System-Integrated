@@ -195,9 +195,6 @@ public class ElectionService {
             user = userRepository.findByEmail("voter@gmail.com").orElse(null);
         }
         if (user == null) {
-            user = userRepository.findByEmail("voter@citizen.in").orElse(null);
-        }
-        if (user == null) {
             List<User> allUsers = userRepository.findAll();
             user = !allUsers.isEmpty() ? allUsers.get(0) : null;
         }

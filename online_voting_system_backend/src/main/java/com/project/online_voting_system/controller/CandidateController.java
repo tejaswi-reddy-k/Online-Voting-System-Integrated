@@ -31,7 +31,7 @@ public class CandidateController {
     ) {
         String email = (authentication != null && authentication.getName() != null)
                 ? authentication.getName()
-                : "candidate@citizen.in";
+                : "voter@gmail.com";
         return ResponseEntity.ok(electionService.registerCandidate(request, email));
     }
 

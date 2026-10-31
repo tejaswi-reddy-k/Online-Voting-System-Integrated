@@ -6,7 +6,7 @@ const INITIAL_EMAILS: EmailNotification[] = [
   {
     id: 'email-welcome-01',
     type: 'REGISTRATION',
-    to: 'voter@citizen.in',
+    to: 'voter@gmail.com',
     subject: 'Welcome to Secure E-Voting Portal - Registered Elector',
     preview: 'Your citizen voting account is verified and ready for participation.',
     body: `Official Voter Registration Confirmation\n========================================\nDear Elector,\n\nWelcome to the Secure Online Voting System. Your digital credentials have been verified on the electoral registry.\n\n• Identity Status: VERIFIED ELECTOR\n• System Audit: Cryptographically Secured (SHA-256)\n\nYou can now review live elections, evaluate candidate manifestos, and cast your democratic ballot.\n\nElection Commission Authority`,

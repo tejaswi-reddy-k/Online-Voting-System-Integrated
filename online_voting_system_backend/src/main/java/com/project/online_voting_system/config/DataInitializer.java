@@ -49,50 +49,13 @@ public class DataInitializer {
                 System.out.println("[BOOTSTRAP] Created default Voter: voter@gmail.com / Tejaswi@123");
             }
 
-            if (!userRepository.existsByEmail("admin@eci.gov.in")) {
-                User admin = new User(
-                        "admin@eci.gov.in",
-                        passwordEncoder.encode("Admin@123"),
-                        "Chief Election Officer",
-                        "IND-ADM00002",
-                        "National Parliamentary HQ",
-                        Role.ADMIN,
-                        true
-                );
-                admin.setDob("1980-01-01");
-                userRepository.save(admin);
-                System.out.println("[BOOTSTRAP] Created fallback Admin: admin@eci.gov.in / Admin@123");
-            }
-
-            if (!userRepository.existsByEmail("teju@gmail.com")) {
-                User admin = new User(
-                        "teju@gmail.com",
-                        passwordEncoder.encode("Tejaswi@17"),
-                        "System Administrator",
-                        "IND-ADM00003",
-                        "General Parliamentary Constituency",
-                        Role.ADMIN,
-                        true
-                );
-                admin.setDob("2000-05-17");
-                userRepository.save(admin);
-                System.out.println("[BOOTSTRAP] Created default Admin: teju@gmail.com / Tejaswi@17");
-            }
-
-            if (!userRepository.existsByEmail("voter@citizen.in")) {
-                User voter = new User(
-                        "voter@citizen.in",
-                        passwordEncoder.encode("Voter123!"),
-                        "Ramesh Kumar Sharma",
-                        "WXJ1234567",
-                        "Varanasi Parliamentary Constituency (UP-77)",
-                        Role.VOTER,
-                        true
-                );
-                voter.setDob("1995-08-15");
-                userRepository.save(voter);
-                System.out.println("[BOOTSTRAP] Created fallback Voter: voter@citizen.in / Voter123!");
-            }
+            // Enforce that only admin@gmail.com and voter@gmail.com exist
+            userRepository.findAll().forEach(u -> {
+                if (!"admin@gmail.com".equalsIgnoreCase(u.getEmail()) && !"voter@gmail.com".equalsIgnoreCase(u.getEmail())) {
+                    userRepository.delete(u);
+                    System.out.println("[BOOTSTRAP] Removed non-target user: " + u.getEmail());
+                }
+            });
 
             if (electionRepository.count() == 0) {
                 java.time.LocalDateTime now = java.time.LocalDateTime.now();

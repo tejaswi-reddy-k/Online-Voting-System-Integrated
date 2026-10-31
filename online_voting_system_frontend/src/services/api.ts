@@ -442,7 +442,7 @@ export const apiService = {
         paymentMethod: data.paymentMethod,
         treasuryReference: 'TREASURY-REF-' + Date.now(),
         timestamp: new Date().toISOString(),
-        candidateEmail: 'candidate@citizen.in',
+        candidateEmail: 'voter@gmail.com',
         description: 'Statutory Candidacy Nomination Security Deposit'
       };
     }

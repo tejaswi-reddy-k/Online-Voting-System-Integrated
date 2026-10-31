@@ -142,7 +142,7 @@ public class PaymentService {
                 "ONLINE_TREASURY_GATEWAY",
                 "TREASURY-REF-VERIFIED",
                 LocalDateTime.now(),
-                "verified.candidate@citizen.in",
+                "voter@gmail.com",
                 "Statutory Candidacy Nomination Security Deposit"
         );
     }

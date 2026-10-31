@@ -105,7 +105,7 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
   };
 
   const handleEmailResults = async () => {
-    const targetEmail = user?.email || 'voter@citizen.in';
+    const targetEmail = user?.email || 'voter@gmail.com';
     
     // 1. Dispatch Live Results Email Notification via Backend JavaMailSender
     apiService.sendResultsEmail(
