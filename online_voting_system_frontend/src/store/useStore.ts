@@ -155,9 +155,10 @@ export const useStore = create<AppStore>((set) => ({
   addCandidate: (electionId, candidate) => set((state) => {
     const updatedList = state.elections.map((el) => {
       if (el.id === electionId) {
+        const cands = el.candidates || [];
         return {
           ...el,
-          candidates: [...el.candidates.filter(c => c.id !== candidate.id), candidate]
+          candidates: [...cands.filter(c => c.id !== candidate.id), candidate]
         };
       }
       return el;
@@ -169,9 +170,10 @@ export const useStore = create<AppStore>((set) => ({
   deleteCandidate: (electionId, candidateId) => set((state) => {
     const updatedList = state.elections.map((el) => {
       if (el.id === electionId) {
+        const cands = el.candidates || [];
         return {
           ...el,
-          candidates: el.candidates.filter(c => c.id !== candidateId)
+          candidates: cands.filter(c => c.id !== candidateId)
         };
       }
       return el;
@@ -183,9 +185,10 @@ export const useStore = create<AppStore>((set) => ({
   recordVote: (electionId, candidateId) => set((state) => {
     const updatedList = state.elections.map((el) => {
       if (el.id === electionId) {
+        const cands = el.candidates || [];
         return {
           ...el,
-          candidates: el.candidates.map((cand) =>
+          candidates: cands.map((cand) =>
             cand.id === candidateId
               ? { ...cand, voteCount: (cand.voteCount || 0) + 1 }
               : cand

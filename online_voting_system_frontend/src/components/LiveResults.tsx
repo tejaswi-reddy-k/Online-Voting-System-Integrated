@@ -65,8 +65,16 @@ export const LiveResults: React.FC = () => {
 
   const currentElection = elections.find(e => e.id === selectedElectionId) || elections[0];
 
+  if (!currentElection) {
+    return (
+      <div style={{ maxWidth: '980px', margin: '2rem auto', textAlign: 'center' }} className="glass-panel">
+        <p style={{ padding: '3rem', color: 'var(--text-muted)' }}>No elections available for live audit.</p>
+      </div>
+    );
+  }
+
   // Candidates list merged with live stream tallies
-  const displayCandidates = currentElection.candidates.map(candidate => {
+  const displayCandidates = (currentElection.candidates || []).map(candidate => {
     if (liveResults && liveResults.electionId === currentElection.id) {
       const liveCand = liveResults.results.find(r => r.id === candidate.id);
       if (liveCand) {

@@ -108,7 +108,7 @@ export const HomeLiveVoteStream: React.FC<HomeLiveVoteStreamProps> = ({ election
   if (!currentElection) return null;
 
   // Candidates merged with live stream tallies
-  const candidates = currentElection.candidates.map(candidate => {
+  const candidates = (currentElection.candidates || []).map(candidate => {
     if (liveResults && liveResults.electionId === currentElection.id) {
       const match = liveResults.results.find(r => r.id === candidate.id);
       if (match) {

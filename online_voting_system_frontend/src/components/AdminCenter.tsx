@@ -259,10 +259,10 @@ export const AdminCenter: React.FC = () => {
   };
 
   const totalVotesAcrossAll = elections.reduce((acc, el) => {
-    return acc + el.candidates.reduce((cAcc, c) => cAcc + (c.voteCount || 0), 0);
+    return acc + (el.candidates || []).reduce((cAcc, c) => cAcc + (c.voteCount || 0), 0);
   }, 0);
 
-  const totalCandidatesAcrossAll = elections.reduce((acc, el) => acc + el.candidates.length, 0);
+  const totalCandidatesAcrossAll = elections.reduce((acc, el) => acc + (el.candidates || []).length, 0);
 
   return (
     <div style={{ maxWidth: '1100px', margin: '1rem auto' }} className="animate-fade-in">
@@ -737,10 +737,10 @@ export const AdminCenter: React.FC = () => {
               {/* Candidate Roster Preview */}
               <div style={{ marginTop: '1.2rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
-                  Nominated Candidates ({election.candidates.length}):
+                  Nominated Candidates ({(election.candidates || []).length}):
                 </div>
                 <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
-                  {election.candidates.map((cand) => (
+                  {(election.candidates || []).map((cand) => (
                     <div 
                       key={cand.id}
                       style={{
@@ -869,7 +869,7 @@ export const AdminCenter: React.FC = () => {
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-              {elections.find(e => e.id === selectedElectionForCand)?.candidates.map((c) => (
+              {(elections.find(e => e.id === selectedElectionForCand)?.candidates || []).map((c) => (
                 <div 
                   key={c.id}
                   style={{

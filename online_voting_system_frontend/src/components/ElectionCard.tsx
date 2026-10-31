@@ -31,8 +31,9 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
   const status = getElectionStatus(election);
 
   // Compute vote totals and winner for completed elections
-  const totalVotes = election.candidates.reduce((sum, c) => sum + (c.voteCount || 0), 0);
-  const sortedCandidates = [...election.candidates].sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0));
+  const candidates = election.candidates || [];
+  const totalVotes = candidates.reduce((sum, c) => sum + (c.voteCount || 0), 0);
+  const sortedCandidates = [...candidates].sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0));
   const winner: Candidate | null = sortedCandidates.length > 0 ? sortedCandidates[0] : null;
   const winnerPercentage = (totalVotes > 0 && winner) ? ((winner.voteCount / totalVotes) * 100).toFixed(1) : '0.0';
 
@@ -50,7 +51,7 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
     setSubmitting(true);
     setErrorMsg(null);
 
-    const candidate = election.candidates.find(c => c.id === selectedCandidateId);
+    const candidate = candidates.find(c => c.id === selectedCandidateId);
     const candidateName = candidate ? candidate.name : 'Nominated Candidate';
 
     try {
@@ -553,7 +554,7 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
         <div style={{ marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
             <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc' }}>
-              Nominated Candidates & Electronic Ballot Unit ({election.candidates.length}):
+              Nominated Candidates & Electronic Ballot Unit ({candidates.length}):
             </h4>
             {status === 'UPCOMING' && (
               <button 
@@ -580,7 +581,7 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '1rem'
           }}>
-            {election.candidates.map((candidate: Candidate) => {
+            {candidates.map((candidate: Candidate) => {
               const isSelected = selectedCandidateId === candidate.id;
               const canVoteOnCard = status === 'ONGOING' && !hasVoted;
 
@@ -859,7 +860,7 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
         {status === 'COMPLETED' && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
             <span style={{ fontSize: '0.85rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <CheckCircle2 size={16} color="#facc15" /> Election concluded & certified. Winner: <strong style={{ color: '#facc15' }}>{winner?.name}</strong> ({winner?.party})
+              <CheckCircle2 size={16} color="#facc15" /> Election concluded & certified. {winner ? <>Winner: <strong style={{ color: '#facc15' }}>{winner.name}</strong> ({winner.party})</> : 'No candidates registered.'}
             </span>
             <div style={{ display: 'flex', gap: '0.6rem' }}>
               <button 
