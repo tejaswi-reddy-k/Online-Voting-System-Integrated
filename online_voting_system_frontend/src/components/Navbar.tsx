@@ -172,7 +172,7 @@ export const Navbar: React.FC = () => {
           )}
 
           {/* Admin Control Tab */}
-          {user?.role === 'ROLE_ADMIN' && (
+          {user?.role === 'ROLE_ADMIN' && user?.email?.toLowerCase() === 'admin@gmail.com' && (
             <button 
               onClick={() => setActiveTab('admin')}
               style={{

@@ -41,6 +41,9 @@ public class UserService {
      * - No tokenization/authorization issued at registration
      */
     public SignupResponse signUp(SignupRequest request) {
+        if ("admin@gmail.com".equalsIgnoreCase(request.getEmail().trim())) {
+            throw new RuntimeException("Single-Admin Policy: The administrator account (admin@gmail.com) is unique and cannot be re-registered.");
+        }
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email is already registered with Election Commission.");
         }
@@ -81,44 +84,10 @@ public class UserService {
 
     /**
      * Administrator Registration:
-     * - Registers official administrator account with Role.ADMIN
-     * - No tokenization/authorization issued at registration (authenticate via signin)
+     * Enforces Single-Admin Policy. Only admin@gmail.com is permitted.
      */
     public SignupResponse signUpAdmin(SignupRequest request) {
-        if (userRepository.existsByEmail(request.getEmail().toLowerCase())) {
-            throw new RuntimeException("Email is already registered with Election Commission.");
-        }
-
-        // Auto-generate official Admin Identifier (EPIC)
-        String adminEpic = "IND-ADM" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        Role assignedRole = Role.ADMIN;
-
-        User admin = new User(
-                request.getEmail().toLowerCase(),
-                passwordEncoder.encode(request.getPassword()),
-                request.getFullName(),
-                adminEpic,
-                "National Parliamentary HQ",
-                assignedRole,
-                true
-        );
-        admin.setDob(request.getDob());
-
-        admin = userRepository.save(admin);
-
-        // Dispatch Email Confirmation
-        emailService.sendRegistrationConfirmation(admin.getEmail(), admin.getFullName(), admin.getEpicNumber());
-
-        return new SignupResponse(
-                "Administrator registered successfully. Please proceed to sign in.",
-                admin.getId(),
-                admin.getFullName(),
-                admin.getEmail(),
-                admin.getDob(),
-                admin.getEpicNumber(),
-                admin.getRole().name(),
-                admin.isVerified()
-        );
+        throw new RuntimeException("Single-Admin Policy: Only one administrator is allowed in this system (admin@gmail.com). Additional administrator accounts cannot be created.");
     }
 
     /**
@@ -131,6 +100,12 @@ public class UserService {
 
         User user = userRepository.findByEmail(request.getEmail().toLowerCase())
                 .orElseThrow(() -> new RuntimeException("Elector not found in database"));
+
+        // Enforce single-admin policy: only admin@gmail.com can hold ROLE_ADMIN
+        if (user.getRole() == Role.ADMIN && !"admin@gmail.com".equalsIgnoreCase(user.getEmail())) {
+            user.setRole(Role.VOTER);
+            user = userRepository.save(user);
+        }
 
         // Generate Bearer JWT token for authentication & authorization
         String token = jwtService.generateToken(user.getEmail(), user.getRole().name());

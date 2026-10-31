@@ -4,7 +4,7 @@ import { apiService } from '../services/api';
 import type { Election, Candidate } from '../types';
 import { 
   PlusCircle, Trash2, Edit3, Calendar, Award, Vote, Users, 
-  X, CheckCircle2, AlertTriangle, ShieldCheck, ChevronUp, MapPin
+  X, CheckCircle2, AlertTriangle, ShieldCheck, ChevronUp, MapPin, ShieldAlert
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -263,6 +263,37 @@ export const AdminCenter: React.FC = () => {
   }, 0);
 
   const totalCandidatesAcrossAll = elections.reduce((acc, el) => acc + (el.candidates || []).length, 0);
+
+  if (!user || user.role !== 'ROLE_ADMIN' || user.email?.toLowerCase() !== 'admin@gmail.com') {
+    return (
+      <div style={{ maxWidth: '600px', margin: '4rem auto', textAlign: 'center', padding: '2.5rem' }} className="glass-panel-glow animate-fade-in">
+        <div style={{
+          width: '56px',
+          height: '56px',
+          borderRadius: '16px',
+          background: 'rgba(239, 68, 68, 0.15)',
+          border: '1px solid rgba(239, 68, 68, 0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 1.2rem'
+        }}>
+          <ShieldAlert size={30} color="#ef4444" />
+        </div>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f87171' }}>Access Restricted</h2>
+        <p style={{ color: 'var(--text-muted)', marginTop: '0.6rem', fontSize: '0.92rem', lineHeight: 1.5 }}>
+          Single-Admin Policy active: Only the designated Chief Administrator (<strong>admin@gmail.com</strong>) has access to the Admin Center.
+        </p>
+        <button 
+          onClick={() => setActiveTab('home')}
+          className="btn-primary"
+          style={{ marginTop: '1.5rem', padding: '0.65rem 1.4rem' }}
+        >
+          Return to Elections Home
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: '1100px', margin: '1rem auto' }} className="animate-fade-in">

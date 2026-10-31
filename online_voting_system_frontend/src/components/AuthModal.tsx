@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { apiService } from '../services/api';
-import { ShieldCheck, Mail, Lock, User, Calendar, X, CheckCircle2, AlertTriangle, Key } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, User, Calendar, X, CheckCircle2, AlertTriangle, Key, ShieldAlert } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export const AuthModal: React.FC = () => {
@@ -44,6 +44,15 @@ export const AuthModal: React.FC = () => {
 
     try {
       if (voterAction === 'register') {
+        if (email.trim().toLowerCase() === 'admin@gmail.com') {
+          setLoading(false);
+          setStatusMsg({
+            type: 'error',
+            text: 'Access Denied: admin@gmail.com is reserved as the sole System Administrator.'
+          });
+          return;
+        }
+
         // Strict requirement: Registration inputs: name, dob, email, password only
         const generatedEpic = 'IND-' + Math.random().toString(36).substring(2, 10).toUpperCase();
 
@@ -156,8 +165,18 @@ export const AuthModal: React.FC = () => {
     setStatusMsg(null);
 
     try {
+      const inputEmail = (email || '').trim().toLowerCase();
+      if (inputEmail !== 'admin@gmail.com') {
+        setLoading(false);
+        setStatusMsg({
+          type: 'error',
+          text: 'Access Denied: Single-Admin Policy active. Only the designated Chief Administrator (admin@gmail.com) is permitted.'
+        });
+        return;
+      }
+
       try {
-        const res = await apiService.signIn({ email: email || 'admin@gmail.com', password });
+        const res = await apiService.signIn({ email: inputEmail, password });
         const adminUser = {
           id: res.id || 1,
           email: res.email || email,
@@ -349,19 +368,22 @@ export const AuthModal: React.FC = () => {
         {/* If Admin Gateway: Dedicated Secure Authority Login */}
         {gateway === 'admin' && (
           <div style={{
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.25)',
-            padding: '0.6rem 0.8rem',
+            background: 'rgba(239, 68, 68, 0.12)',
+            border: '1px solid rgba(239, 68, 68, 0.35)',
+            padding: '0.75rem 0.9rem',
             borderRadius: '8px',
             marginBottom: '1.2rem',
-            fontSize: '0.8rem',
-            color: '#fca5a5',
             display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
+            flexDirection: 'column',
+            gap: '0.35rem'
           }}>
-            <Key size={16} color="#f87171" />
-            <span>Authorized Election Commission Personnel Only</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', fontWeight: 700, color: '#f87171' }}>
+              <ShieldAlert size={16} color="#f87171" />
+              <span>Strict Single-Admin Policy Enforced</span>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: '#fecaca', lineHeight: 1.4 }}>
+              The system permits exactly one administrator account (<strong>admin@gmail.com</strong>). All other accounts are restricted to elector status.
+            </div>
           </div>
         )}
 
