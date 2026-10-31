@@ -76,7 +76,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json");
-                            response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Authentication token is missing or invalid. Please sign in (e.g. admin@eci.gov.in / Admin@123) and provide the Bearer token in Swagger Authorize or Authorization header.\"}");
+                            response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Authentication token is missing or invalid. Please sign in (e.g. admin@gmail.com / Tejaswi@123) and provide the Bearer token in Swagger Authorize or Authorization header.\"}");
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);

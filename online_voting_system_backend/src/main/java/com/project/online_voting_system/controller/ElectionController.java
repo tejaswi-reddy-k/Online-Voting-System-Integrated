@@ -91,7 +91,7 @@ public class ElectionController {
     ) {
         String email = (authentication != null && authentication.getName() != null)
                 ? authentication.getName()
-                : "admin@eci.gov.in";
+                : "admin@gmail.com";
         return ResponseEntity.ok(electionService.createElection(request, email));
     }
 
@@ -104,7 +104,7 @@ public class ElectionController {
     ) {
         String email = (authentication != null && authentication.getName() != null)
                 ? authentication.getName()
-                : "admin@eci.gov.in";
+                : "admin@gmail.com";
         return ResponseEntity.ok(electionService.updateElection(id, request, email));
     }
 
@@ -116,7 +116,7 @@ public class ElectionController {
     ) {
         String email = (authentication != null && authentication.getName() != null)
                 ? authentication.getName()
-                : "admin@eci.gov.in";
+                : "admin@gmail.com";
         electionService.deleteElection(id, email);
         return ResponseEntity.ok(Map.of("message", "Election deleted successfully with ID: " + id));
     }

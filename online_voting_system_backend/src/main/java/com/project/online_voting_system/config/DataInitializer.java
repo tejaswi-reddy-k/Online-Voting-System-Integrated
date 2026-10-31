@@ -19,19 +19,49 @@ public class DataInitializer {
             com.project.online_voting_system.repository.CandidateRepository candidateRepository
     ) {
         return args -> {
+            if (!userRepository.existsByEmail("admin@gmail.com")) {
+                User admin = new User(
+                        "admin@gmail.com",
+                        passwordEncoder.encode("Tejaswi@123"),
+                        "Chief Election Administrator",
+                        "IND-ADM00001",
+                        "National Parliamentary HQ",
+                        Role.ADMIN,
+                        true
+                );
+                admin.setDob("1990-01-01");
+                userRepository.save(admin);
+                System.out.println("[BOOTSTRAP] Created default Admin: admin@gmail.com / Tejaswi@123");
+            }
+
+            if (!userRepository.existsByEmail("voter@gmail.com")) {
+                User voter = new User(
+                        "voter@gmail.com",
+                        passwordEncoder.encode("Tejaswi@123"),
+                        "Registered Elector",
+                        "IND-VOT00001",
+                        "Varanasi Parliamentary Constituency (UP-77)",
+                        Role.VOTER,
+                        true
+                );
+                voter.setDob("2000-01-01");
+                userRepository.save(voter);
+                System.out.println("[BOOTSTRAP] Created default Voter: voter@gmail.com / Tejaswi@123");
+            }
+
             if (!userRepository.existsByEmail("admin@eci.gov.in")) {
                 User admin = new User(
                         "admin@eci.gov.in",
                         passwordEncoder.encode("Admin@123"),
                         "Chief Election Officer",
-                        "IND-ADM00001",
+                        "IND-ADM00002",
                         "National Parliamentary HQ",
                         Role.ADMIN,
                         true
                 );
                 admin.setDob("1980-01-01");
                 userRepository.save(admin);
-                System.out.println("[BOOTSTRAP] Created default Admin: admin@eci.gov.in / Admin@123");
+                System.out.println("[BOOTSTRAP] Created fallback Admin: admin@eci.gov.in / Admin@123");
             }
 
             if (!userRepository.existsByEmail("teju@gmail.com")) {
@@ -39,7 +69,7 @@ public class DataInitializer {
                         "teju@gmail.com",
                         passwordEncoder.encode("Tejaswi@17"),
                         "System Administrator",
-                        "IND-ADM00002",
+                        "IND-ADM00003",
                         "General Parliamentary Constituency",
                         Role.ADMIN,
                         true
@@ -61,7 +91,7 @@ public class DataInitializer {
                 );
                 voter.setDob("1995-08-15");
                 userRepository.save(voter);
-                System.out.println("[BOOTSTRAP] Created default Voter: voter@citizen.in / Voter123!");
+                System.out.println("[BOOTSTRAP] Created fallback Voter: voter@citizen.in / Voter123!");
             }
 
             if (electionRepository.count() == 0) {

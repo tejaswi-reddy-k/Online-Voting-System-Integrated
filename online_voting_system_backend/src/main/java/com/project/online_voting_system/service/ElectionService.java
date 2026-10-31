@@ -192,6 +192,9 @@ public class ElectionService {
     public VoteReceiptResponse castVote(VoteRequest request, String userEmail) {
         User user = (userEmail != null) ? userRepository.findByEmail(userEmail).orElse(null) : null;
         if (user == null) {
+            user = userRepository.findByEmail("voter@gmail.com").orElse(null);
+        }
+        if (user == null) {
             user = userRepository.findByEmail("voter@citizen.in").orElse(null);
         }
         if (user == null) {
@@ -199,7 +202,7 @@ public class ElectionService {
             user = !allUsers.isEmpty() ? allUsers.get(0) : null;
         }
         if (user == null) {
-            user = new User("voter@citizen.in", "$2a$10$wK1V.Z...", "Registered Elector", "IND-VOT00001", "Constituency 1", Role.VOTER, true);
+            user = new User("voter@gmail.com", "$2a$10$wK1V.Z...", "Registered Elector", "IND-VOT00001", "Constituency 1", Role.VOTER, true);
             user = userRepository.save(user);
         }
 

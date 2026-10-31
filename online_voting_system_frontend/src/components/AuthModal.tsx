@@ -126,7 +126,7 @@ export const AuthModal: React.FC = () => {
           // Fallback
           const mockUser = {
             id: 2,
-            email: email || 'voter@citizen.in',
+            email: email || 'voter@gmail.com',
             fullName: fullName || 'Ramesh Kumar Sharma',
             dob: '1995-08-15',
             epicNumber: 'WXJ1234567',
@@ -157,7 +157,7 @@ export const AuthModal: React.FC = () => {
 
     try {
       try {
-        const res = await apiService.signIn({ email: email || 'admin@eci.gov.in', password });
+        const res = await apiService.signIn({ email: email || 'admin@gmail.com', password });
         const adminUser = {
           id: res.id || 1,
           email: res.email || email,
@@ -171,7 +171,7 @@ export const AuthModal: React.FC = () => {
       } catch {
         const adminUser = {
           id: 1,
-          email: email || 'admin@eci.gov.in',
+          email: email || 'admin@gmail.com',
           fullName: 'System Administrator',
           epicNumber: 'IND-ADM00001',
           constituency: 'National Parliamentary HQ',
@@ -437,7 +437,7 @@ export const AuthModal: React.FC = () => {
                 <input 
                   type="email" 
                   required
-                  placeholder="e.g. voter@citizen.in"
+                  placeholder="e.g. voter@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="input-control"
@@ -498,7 +498,7 @@ export const AuthModal: React.FC = () => {
                 <input 
                   type="email" 
                   required
-                  placeholder="admin@eci.gov.in"
+                  placeholder="admin@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="input-control"
@@ -557,23 +557,23 @@ export const AuthModal: React.FC = () => {
               onClick={() => {
                 setGateway('voter');
                 setVoterAction('signin');
-                setEmail('voter@citizen.in');
-                setPassword('Voter123!');
+                setEmail('voter@gmail.com');
+                setPassword('Tejaswi@123');
               }}
               style={{ background: 'rgba(249, 115, 22, 0.15)', color: '#fb923c', border: '1px solid rgba(249,115,22,0.3)', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
             >
-              Fill Citizen Elector
+              Fill Voter (voter@gmail.com)
             </button>
             <button 
               type="button"
               onClick={() => {
                 setGateway('admin');
-                setEmail('admin@eci.gov.in');
-                setPassword('Admin123!');
+                setEmail('admin@gmail.com');
+                setPassword('Tejaswi@123');
               }}
               style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
             >
-              Fill Admin
+              Fill Admin (admin@gmail.com)
             </button>
           </div>
         </div>

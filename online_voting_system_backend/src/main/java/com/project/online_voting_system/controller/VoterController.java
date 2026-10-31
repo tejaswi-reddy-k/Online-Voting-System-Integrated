@@ -28,7 +28,7 @@ public class VoterController {
     ) {
         String email = (authentication != null && authentication.getName() != null)
                 ? authentication.getName()
-                : "voter@citizen.in";
+                : "voter@gmail.com";
         return ResponseEntity.ok(electionService.castVote(request, email));
     }
 
