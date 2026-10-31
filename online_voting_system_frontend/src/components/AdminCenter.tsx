@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { apiService } from '../services/api';
 import type { Election, Candidate } from '../types';
+import { isVoteCountLive } from '../types';
 import { 
   PlusCircle, Trash2, Edit3, Calendar, Award, Vote, Users, 
   X, CheckCircle2, AlertTriangle, ShieldCheck, ChevronUp, MapPin, ShieldAlert
@@ -256,6 +257,35 @@ export const AdminCenter: React.FC = () => {
     }).catch(() => {});
 
     setStatusMsg({ type: 'success', text: 'Candidate removed from ballot.' });
+  };
+
+  const handleToggleAnnounceResults = async (election: Election) => {
+    const targetState = !election.resultsAnnounced;
+    setStatusMsg(null);
+    try {
+      if (token) {
+        await apiService.announceResults(election.id, targetState, token);
+      }
+      updateElection(election.id, { resultsAnnounced: targetState });
+      if (targetState) {
+        confetti({ particleCount: 70, spread: 60 });
+        setStatusMsg({ 
+          type: 'success', 
+          text: `Official results declared for "${election.title}". Vote count stream concluded; final certified results published.` 
+        });
+      } else {
+        setStatusMsg({ 
+          type: 'success', 
+          text: `Election "${election.title}" returned to COUNTING state. Real-time stream reactivated.` 
+        });
+      }
+    } catch {
+      updateElection(election.id, { resultsAnnounced: targetState });
+      setStatusMsg({ 
+        type: 'success', 
+        text: `Results status updated for "${election.title}".` 
+      });
+    }
   };
 
   const totalVotesAcrossAll = elections.reduce((acc, el) => {
@@ -727,8 +757,57 @@ export const AdminCenter: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Actions: Edit & Delete (NO TOGGLE FOR RESULTS ANNOUNCED) */}
+                {/* Actions: Announcement Control, Edit & Delete */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  {isVoteCountLive(election) ? (
+                    <button 
+                      onClick={() => handleToggleAnnounceResults(election)}
+                      style={{
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        color: '#ffffff',
+                        border: 'none',
+                        padding: '0.5rem 0.9rem',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)'
+                      }}
+                      title="Voting has closed and vote counting is streaming live. Click when count concludes to announce certified results."
+                    >
+                      <Award size={15} />
+                      <span>Announce Official Results</span>
+                    </button>
+                  ) : election.resultsAnnounced ? (
+                    <button 
+                      onClick={() => handleToggleAnnounceResults(election)}
+                      style={{
+                        background: 'rgba(234, 179, 8, 0.12)',
+                        color: '#facc15',
+                        border: '1px solid rgba(234, 179, 8, 0.35)',
+                        padding: '0.5rem 0.8rem',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontSize: '0.82rem',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem'
+                      }}
+                      title="Results declared. Click if you need to reopen the live count stream."
+                    >
+                      <CheckCircle2 size={14} color="#facc15" />
+                      <span>Results Declared (Reopen Count)</span>
+                    </button>
+                  ) : (
+                    <span style={{ fontSize: '0.75rem', color: '#4ade80', background: 'rgba(34, 197, 94, 0.1)', padding: '0.35rem 0.65rem', borderRadius: '6px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <ShieldCheck size={13} /> Voting Active (Counts Sealed)
+                    </span>
+                  )}
+
                   <button 
                     onClick={() => {
                       setEditingElection(election);

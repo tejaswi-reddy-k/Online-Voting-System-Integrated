@@ -1,4 +1,4 @@
-export type ElectionStatus = 'UPCOMING' | 'ONGOING' | 'COMPLETED';
+export type ElectionStatus = 'UPCOMING' | 'ONGOING' | 'COUNTING' | 'COMPLETED';
 
 export interface User {
   id: number;
@@ -110,6 +110,13 @@ export interface ElectionResults {
   results: CandidateResult[];
 }
 
+export function isVoteCountLive(election: Election): boolean {
+  const now = new Date().getTime();
+  const end = new Date(election.endTime).getTime();
+  // Live vote count streams ONLY after voting closes and before results are announced
+  return now > end && !election.resultsAnnounced;
+}
+
 export function getElectionStatus(election: Election): ElectionStatus {
   const now = new Date().getTime();
   const start = new Date(election.startTime).getTime();
@@ -118,8 +125,10 @@ export function getElectionStatus(election: Election): ElectionStatus {
   if (now < start) {
     return 'UPCOMING';
   } else if (now >= start && now <= end) {
-    return 'ONGOING';
+    return 'ONGOING'; // Polling underway, vote count confidential & sealed
+  } else if (now > end && !election.resultsAnnounced) {
+    return 'COUNTING'; // Polling closed, vote count streaming live!
   } else {
-    return 'COMPLETED';
+    return 'COMPLETED'; // Results officially announced and certified
   }
 }

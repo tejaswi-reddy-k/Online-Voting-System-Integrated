@@ -120,4 +120,22 @@ public class ElectionController {
         electionService.deleteElection(id, email);
         return ResponseEntity.ok(Map.of("message", "Election deleted successfully with ID: " + id));
     }
+
+    @PutMapping("/admin/{id}/announce-results")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<Map<String, Object>> announceResults(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "true") boolean announced,
+            Authentication authentication
+    ) {
+        String email = (authentication != null && authentication.getName() != null)
+                ? authentication.getName()
+                : "admin@gmail.com";
+        electionService.toggleResultsAnnouncement(id, announced, email);
+        return ResponseEntity.ok(Map.of(
+                "electionId", id,
+                "resultsAnnounced", announced,
+                "message", announced ? "Official election results announced and certified." : "Results reverted to counting phase."
+        ));
+    }
 }

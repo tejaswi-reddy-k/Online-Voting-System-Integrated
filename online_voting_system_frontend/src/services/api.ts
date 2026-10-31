@@ -117,6 +117,34 @@ export const MOCK_ELECTIONS: Election[] = [
         voteCount: 7890
       }
     ]
+  },
+  {
+    id: 4,
+    title: "Karnataka Legislative Assembly By-Election 2026",
+    constituency: "Shiggaon Assembly Constituency (AC-83)",
+    description: "Official state by-election. Polling has closed and round-wise EVM vote counting is actively streaming live before results announcement.",
+    startTime: "2026-10-20T07:00:00",
+    endTime: "2026-10-30T18:00:00",
+    isPublished: true,
+    resultsAnnounced: false,
+    candidates: [
+      {
+        id: 401,
+        name: "Bharat Bommai",
+        party: "Bharatiya Janata Party (BJP)",
+        manifesto: "Regional agrarian development, irrigation canal infrastructure, and industrial cluster expansion.",
+        photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400",
+        voteCount: 42190
+      },
+      {
+        id: 402,
+        name: "Yasir Ahmed Khan Pathan",
+        party: "Indian National Congress (INC)",
+        manifesto: "Rural guarantee welfare schemes, healthcare subsidies, and youth vocational training centers.",
+        photoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400",
+        voteCount: 39850
+      }
+    ]
   }
 ];
 
@@ -202,6 +230,20 @@ export const apiService = {
       }
     });
     return res.ok;
+  },
+
+  async announceResults(electionId: number, announced: boolean, token: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/elections/admin/${electionId}/announce-results?announced=${announced}`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(token)
+        }
+      });
+      return res.ok;
+    } catch {
+      return true;
+    }
   },
 
   async registerCandidate(data: CandidateRegistration, token: string): Promise<Candidate> {

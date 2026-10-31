@@ -20,6 +20,7 @@ export const HomePage: React.FC<HomePageProps> = ({ elections: propElections }) 
   const elections = propElections || storeElections;
 
   // Classify elections
+  const countingElections = elections.filter(e => getElectionStatus(e) === 'COUNTING');
   const ongoingElections = elections.filter(e => getElectionStatus(e) === 'ONGOING');
   const upcomingElections = elections.filter(e => getElectionStatus(e) === 'UPCOMING');
   const completedElections = elections.filter(e => getElectionStatus(e) === 'COMPLETED');
@@ -69,20 +70,24 @@ export const HomePage: React.FC<HomePageProps> = ({ elections: propElections }) 
           </h1>
 
           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-            Explore ongoing, upcoming, and completed democratic elections. Review dates, candidates, and live streaming tallies available to all citizens without requiring login.
+            Explore democratic elections across all stages. Cast your encrypted ballot during voting hours, and watch real-time EVM vote counting stream live once polling closes until official results are declared.
           </p>
 
           {/* Quick Shortcuts */}
           <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
             <button 
               onClick={() => {
-                if (ongoingElections.length > 0) {
+                if (countingElections.length > 0) {
+                  setSelectedElectionId(countingElections[0].id);
+                } else if (ongoingElections.length > 0) {
                   setSelectedElectionId(ongoingElections[0].id);
                 }
                 setActiveTab('results');
               }}
               style={{
-                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                background: countingElections.length > 0 
+                  ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' 
+                  : 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
                 color: '#ffffff',
                 border: 'none',
                 padding: '0.65rem 1.4rem',
@@ -93,11 +98,15 @@ export const HomePage: React.FC<HomePageProps> = ({ elections: propElections }) 
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                boxShadow: '0 4px 15px rgba(239, 68, 68, 0.35)'
+                boxShadow: countingElections.length > 0 ? '0 4px 15px rgba(239, 68, 68, 0.35)' : '0 4px 15px rgba(249, 115, 22, 0.25)'
               }}
             >
-              <Radio size={16} className="pulse-indicator" />
-              <span>Watch Live Stream Broadcast (Open to All)</span>
+              <Radio size={16} className={countingElections.length > 0 ? 'pulse-indicator' : ''} />
+              <span>
+                {countingElections.length > 0 
+                  ? `🔴 Watch Live Vote Count Stream (${countingElections.length} Active)` 
+                  : 'View Live Results & Audit Portal'}
+              </span>
             </button>
 
             <button 
@@ -115,7 +124,7 @@ export const HomePage: React.FC<HomePageProps> = ({ elections: propElections }) 
       {/* Real-Time Vote Stream on Home Page */}
       <HomeLiveVoteStream elections={elections} />
 
-      {/* FILTER TABS: UPCOMING, ONGOING, COMPLETED */}
+      {/* FILTER TABS: COUNTING, ONGOING, UPCOMING, COMPLETED */}
       <div style={{
         background: 'rgba(255, 255, 255, 0.02)',
         border: '1px solid var(--border-subtle)',
@@ -132,7 +141,8 @@ export const HomePage: React.FC<HomePageProps> = ({ elections: propElections }) 
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           {[
             { key: 'ALL', label: 'All Elections', count: elections.length, color: '#fb923c' },
-            { key: 'ONGOING', label: 'ONGOING (Live)', count: ongoingElections.length, color: '#4ade80' },
+            { key: 'COUNTING', label: 'COUNTING (Live Stream)', count: countingElections.length, color: '#ef4444' },
+            { key: 'ONGOING', label: 'VOTING ACTIVE', count: ongoingElections.length, color: '#4ade80' },
             { key: 'UPCOMING', label: 'UPCOMING', count: upcomingElections.length, color: '#38bdf8' },
             { key: 'COMPLETED', label: 'COMPLETED', count: completedElections.length, color: '#94a3b8' }
           ].map(tab => {
@@ -156,15 +166,18 @@ export const HomePage: React.FC<HomePageProps> = ({ elections: propElections }) 
                   transition: 'all 0.2s'
                 }}
               >
+                {tab.key === 'COUNTING' && (
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }} className="pulse-indicator"></span>
+                )}
                 {tab.key === 'ONGOING' && (
-                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#22c55e' }} className="pulse-indicator"></span>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#22c55e' }}></span>
                 )}
                 {tab.key === 'UPCOMING' && <Clock size={14} color="#38bdf8" />}
                 {tab.key === 'COMPLETED' && <CheckCircle2 size={14} color="#94a3b8" />}
                 <span>{tab.label}</span>
                 <span style={{
                   background: isSelected ? tab.color : 'rgba(255,255,255,0.06)',
-                  color: isSelected ? '#000000' : 'var(--text-muted)',
+                  color: isSelected ? (tab.key === 'COUNTING' ? '#ffffff' : '#000000') : 'var(--text-muted)',
                   fontSize: '0.72rem',
                   fontWeight: 800,
                   padding: '0.1rem 0.45rem',

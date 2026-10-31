@@ -158,6 +158,25 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
 
   const statusBadge = () => {
     switch (status) {
+      case 'COUNTING':
+        return (
+          <span style={{
+            background: 'rgba(239, 68, 68, 0.18)',
+            color: '#f87171',
+            border: '1px solid rgba(239, 68, 68, 0.5)',
+            padding: '0.25rem 0.8rem',
+            borderRadius: '9999px',
+            fontSize: '0.78rem',
+            fontWeight: 800,
+            letterSpacing: '0.04em',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.45rem'
+          }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }} className="pulse-indicator"></span>
+            COUNTING LIVE • STREAMING NOW
+          </span>
+        );
       case 'ONGOING':
         return (
           <span style={{
@@ -173,8 +192,8 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
             alignItems: 'center',
             gap: '0.45rem'
           }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }} className="pulse-indicator"></span>
-            ONGOING • LIVE VOTING
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }}></span>
+            VOTING ACTIVE • BALLOT OPEN
           </span>
         );
       case 'UPCOMING':
@@ -224,9 +243,11 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
       style={{
         padding: '2.2rem',
         marginBottom: '2rem',
-        border: status === 'ONGOING' 
-          ? '1px solid rgba(34, 197, 94, 0.35)' 
-          : (status === 'COMPLETED' ? '1px solid rgba(234, 179, 8, 0.35)' : '1px solid var(--border-subtle)'),
+        border: status === 'COUNTING'
+          ? '1px solid rgba(239, 68, 68, 0.45)'
+          : (status === 'ONGOING' 
+            ? '1px solid rgba(34, 197, 94, 0.35)' 
+            : (status === 'COMPLETED' ? '1px solid rgba(234, 179, 8, 0.35)' : '1px solid var(--border-subtle)')),
         borderRadius: '16px',
         position: 'relative'
       }}
@@ -260,9 +281,9 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
         <button 
           onClick={handleWatchLiveStream}
           style={{
-            background: status === 'ONGOING' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-            color: status === 'ONGOING' ? '#f87171' : 'var(--text-muted)',
-            border: `1px solid ${status === 'ONGOING' ? 'rgba(239, 68, 68, 0.4)' : 'var(--border-subtle)'}`,
+            background: status === 'COUNTING' ? 'rgba(239, 68, 68, 0.18)' : 'rgba(255, 255, 255, 0.05)',
+            color: status === 'COUNTING' ? '#f87171' : (status === 'COMPLETED' ? '#facc15' : 'var(--text-muted)'),
+            border: `1px solid ${status === 'COUNTING' ? 'rgba(239, 68, 68, 0.5)' : 'var(--border-subtle)'}`,
             padding: '0.55rem 1rem',
             borderRadius: '10px',
             fontSize: '0.82rem',
@@ -273,9 +294,16 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
             gap: '0.45rem'
           }}
         >
-          {status === 'ONGOING' && <Radio size={14} className="pulse-indicator" />}
+          {status === 'COUNTING' && <Radio size={14} className="pulse-indicator" color="#ef4444" />}
           {status === 'COMPLETED' && <BarChart3 size={14} color="#facc15" />}
-          <span>{status === 'COMPLETED' ? 'View Official Audit Ledger' : 'Live Stream Tallies (Open to All)'}</span>
+          {status === 'ONGOING' && <Clock size={14} color="#fb923c" />}
+          {status === 'UPCOMING' && <Clock size={14} color="#38bdf8" />}
+          <span>
+            {status === 'COUNTING' && '🔴 Watch Live Vote Count Stream →'}
+            {status === 'COMPLETED' && 'View Certified Results Ledger'}
+            {status === 'ONGOING' && 'Vote Count Streams After Voting Closes'}
+            {status === 'UPCOMING' && 'Voting Scheduled'}
+          </span>
         </button>
       </div>
 
@@ -562,9 +590,46 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
         </div>
       )}
 
-      {/* ONGOING / UPCOMING: EVM Electronic Ballot Unit for Candidates */}
+      {/* ONGOING / COUNTING / UPCOMING: EVM Electronic Ballot Unit for Candidates */}
       {status !== 'COMPLETED' && (
         <div style={{ marginBottom: '1.5rem' }}>
+          {status === 'COUNTING' && (
+            <div style={{
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+              padding: '0.9rem 1.2rem',
+              borderRadius: '10px',
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.8rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <Radio size={18} color="#f87171" className="pulse-indicator" />
+                <span style={{ fontSize: '0.85rem', color: '#fca5a5', fontWeight: 600 }}>
+                  Voting has closed. Electronic ballot units are sealed. Live round-wise vote counting is broadcasting live now!
+                </span>
+              </div>
+              <button
+                onClick={handleWatchLiveStream}
+                style={{
+                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '0.45rem 1rem',
+                  borderRadius: '6px',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                Watch Live Stream →
+              </button>
+            </div>
+          )}
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc' }}>
               Nominated Candidates & Electronic Ballot Unit ({candidates.length}):
@@ -902,6 +967,40 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
               </button>
             )}
           </>
+        )}
+
+        {status === 'COUNTING' && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
+            <span style={{ fontSize: '0.85rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <Radio size={16} className="pulse-indicator" color="#ef4444" />
+              <span>Voting closed. <strong>Round-by-round EVM vote counting is streaming live</strong> until results announcement!</span>
+            </span>
+            <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+              <button 
+                onClick={handleWatchLiveStream}
+                className="btn-primary"
+                style={{ 
+                  fontSize: '0.88rem', 
+                  padding: '0.65rem 1.4rem', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.45rem',
+                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                }}
+              >
+                <Radio size={15} className="pulse-indicator" /> Watch Live Vote Count Stream →
+              </button>
+              {hasVoted && (
+                <button 
+                  onClick={() => setActiveTab('verify')}
+                  className="btn-secondary"
+                  style={{ fontSize: '0.88rem' }}
+                >
+                  Verify Digital Receipt
+                </button>
+              )}
+            </div>
+          </div>
         )}
 
         {status === 'UPCOMING' && (
