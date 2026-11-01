@@ -22,6 +22,10 @@ public class CandidateRegistrationRequest {
 
     private Double securityDepositAmount = 25.00;
 
+    private String dob;
+
+    private Integer age;
+
     public CandidateRegistrationRequest() {
     }
 
@@ -97,5 +101,21 @@ public class CandidateRegistrationRequest {
 
     public void setSecurityDepositAmount(Double securityDepositAmount) {
         this.securityDepositAmount = securityDepositAmount;
+    }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 }

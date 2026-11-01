@@ -31,7 +31,6 @@ export const HomePage: React.FC<HomePageProps> = ({ elections: propElections }) 
     const matchesFilter = selectedStatusFilter === 'ALL' || status === selectedStatusFilter;
     const matchesSearch = 
       election.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (election.constituency && election.constituency.toLowerCase().includes(searchQuery.toLowerCase())) ||
       election.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
@@ -62,7 +61,7 @@ export const HomePage: React.FC<HomePageProps> = ({ elections: propElections }) 
             color: '#fb923c',
             marginBottom: '1rem'
           }}>
-            <Sparkles size={14} /> National E-Voting & Verification Portal
+            <Sparkles size={14} /> Digital Election Commission • Electronic Voting Portal
           </div>
 
           <h1 style={{ fontSize: '2.4rem', fontWeight: 900, lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: '0.8rem' }}>
@@ -195,7 +194,7 @@ export const HomePage: React.FC<HomePageProps> = ({ elections: propElections }) 
           <Search size={16} style={{ position: 'absolute', left: '12px', top: '10px', color: 'var(--text-dim)' }} />
           <input 
             type="text" 
-            placeholder="Search elections, state, or constituency..."
+            placeholder="Search elections by title or details..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input-control"

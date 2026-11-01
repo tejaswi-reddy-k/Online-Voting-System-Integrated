@@ -6,7 +6,6 @@ export interface User {
   fullName: string;
   dob?: string;
   epicNumber: string; // Voter ID Card (EPIC)
-  constituency: string;
   role: 'ROLE_VOTER' | 'ROLE_ADMIN';
   isVerified: boolean;
 }
@@ -36,12 +35,13 @@ export interface Candidate {
   manifesto: string;
   photoUrl: string;
   voteCount: number;
+  dob?: string;
+  age?: number;
 }
 
 export interface Election {
   id: number;
   title: string;
-  constituency?: string;
   description: string;
   startTime: string;
   endTime: string;
@@ -56,6 +56,8 @@ export interface CandidateRegistration {
   party: string;
   manifesto: string;
   photoUrl: string;
+  dob?: string;
+  age?: number;
   paymentTransactionId?: string;
   securityDepositAmount?: number;
 }
@@ -131,4 +133,17 @@ export function getElectionStatus(election: Election): ElectionStatus {
   } else {
     return 'COMPLETED'; // Results officially announced and certified
   }
+}
+
+export function calculateAge(dobString?: string): number {
+  if (!dobString || !dobString.trim()) return 0;
+  const birth = new Date(dobString.trim());
+  if (isNaN(birth.getTime())) return 0;
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
 }

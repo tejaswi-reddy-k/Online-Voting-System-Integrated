@@ -66,7 +66,7 @@ export const App: React.FC = () => {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
             <ShieldCheck size={20} color="#fb923c" />
-            <span>ECI MATDAAN • National Democratic Electronic Voting Architecture</span>
+            <span>Digital Election Commission • National Democratic Electronic Voting Architecture</span>
           </div>
           <div>
             End-to-End Cryptographic Auditability • Live Stream SSE • Spring Boot & React Vite

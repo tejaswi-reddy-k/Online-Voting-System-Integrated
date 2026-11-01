@@ -63,7 +63,7 @@ export const Navbar: React.FC = () => {
           </div>
           <div>
             <div style={{ fontWeight: 800, fontSize: '1.2rem', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>MATDAAN</span>
+              <span>Digital Election Commission</span>
               <span style={{ 
                 fontSize: '0.65rem', 
                 background: 'rgba(249, 115, 22, 0.2)', 
@@ -75,7 +75,7 @@ export const Navbar: React.FC = () => {
               }}>DEMOCRATIC PORTAL</span>
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-              Election Commission of India | Cryptographic E-Voting Architecture
+              National Cryptographic E-Voting Architecture
             </div>
           </div>
         </div>

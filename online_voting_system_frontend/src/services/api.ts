@@ -13,7 +13,6 @@ export const MOCK_ELECTIONS: Election[] = [
   {
     id: 1,
     title: "18th Lok Sabha General Election 2026",
-    constituency: "Varanasi Parliamentary Constituency (UP-77)",
     description: "Official Parliamentary General Election to elect the Member of Parliament (Lok Sabha). Secure digital ballot certified with cryptographic receipt.",
     startTime: "2026-10-25T08:00:00",
     endTime: "2026-11-05T18:00:00",
@@ -48,7 +47,7 @@ export const MOCK_ELECTIONS: Election[] = [
         id: 104,
         name: "NOTA (None of the Above)",
         party: "Constitutional Option / Neutral",
-        manifesto: "Exercise your fundamental democratic right to reject all nominated candidates in this constituency.",
+        manifesto: "Exercise your fundamental democratic right to reject all nominated candidates.",
         photoUrl: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=400",
         voteCount: 1240
       }
@@ -57,7 +56,6 @@ export const MOCK_ELECTIONS: Election[] = [
   {
     id: 2,
     title: "Maharashtra Legislative Assembly Election (Vidhan Sabha)",
-    constituency: "Nagpur South West Assembly Constituency (AC-52)",
     description: "Upcoming state legislative election to elect the Member of the Legislative Assembly (MLA) for Maharashtra State Assembly.",
     startTime: "2026-11-15T07:00:00",
     endTime: "2026-11-25T18:00:00",
@@ -85,7 +83,6 @@ export const MOCK_ELECTIONS: Election[] = [
   {
     id: 3,
     title: "Delhi Legislative Assembly Election (Vidhan Sabha)",
-    constituency: "New Delhi Assembly Constituency (AC-40)",
     description: "Concluded state legislative assembly ballot. Official audited results have been certified by the Election Commission.",
     startTime: "2026-10-01T07:00:00",
     endTime: "2026-10-20T18:00:00",
@@ -121,7 +118,6 @@ export const MOCK_ELECTIONS: Election[] = [
   {
     id: 4,
     title: "Karnataka Legislative Assembly By-Election 2026",
-    constituency: "Shiggaon Assembly Constituency (AC-83)",
     description: "Official state by-election. Polling has closed and round-wise EVM vote counting is actively streaming live before results announcement.",
     startTime: "2026-10-20T07:00:00",
     endTime: "2026-10-30T18:00:00",

@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { apiService } from '../services/api';
 import type { PaymentReceipt, Candidate } from '../types';
+import { calculateAge } from '../types';
 import { 
   Award, CheckCircle2, User, Building, FileText, Image, ArrowLeft,
   CreditCard, QrCode, Building2, ShieldCheck, Lock, ArrowRight,
   Printer, RefreshCw, Edit3, PlusCircle, Eye, AlertTriangle, X,
-  MapPin, LogOut
+  MapPin, LogOut, Calendar
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -37,6 +38,7 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
   // Nomination (Add) Form States
   const [selectedElectionId, setSelectedElectionId] = useState<number>(elections[0]?.id || 1);
   const [candidateName, setCandidateName] = useState(user?.fullName || '');
+  const [candidateDob, setCandidateDob] = useState('1995-01-01');
   const [party, setParty] = useState('');
   const [manifesto, setManifesto] = useState('');
   const [photoUrl, setPhotoUrl] = useState('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400');
@@ -65,6 +67,16 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
     e.preventDefault();
     if (!isAuthenticated || !token) {
       openAuthModal('voter');
+      return;
+    }
+
+    // Constitutional requirement: Candidate must be at least 25 years old
+    const candidateAge = calculateAge(candidateDob);
+    if (candidateAge < 25) {
+      setStatusMsg({
+        type: 'error',
+        text: `Constitutional Ineligibility: Candidates must be at least 25 years of age to contest an election (Current age: ${candidateAge} years).`
+      });
       return;
     }
 
@@ -114,7 +126,9 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
           manifesto: manifesto || `Dedicated to public service, constitutional values, and transparent governance.`,
           photoUrl: photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
           paymentTransactionId: receipt.transactionId,
-          securityDepositAmount: depositAmount
+          securityDepositAmount: depositAmount,
+          dob: candidateDob,
+          age: calculateAge(candidateDob)
         }, token || '');
       } catch (err: any) {
         console.warn('Backend candidate registration warning:', err);
@@ -126,7 +140,9 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
         party: party || 'Independent Candidate',
         manifesto: manifesto || `Dedicated to public service, constitutional values, and transparent governance.`,
         photoUrl: photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
-        voteCount: 0
+        voteCount: 0,
+        dob: candidateDob,
+        age: calculateAge(candidateDob)
       };
 
       addCandidate(activeElectionId, enrolledCandidate);
@@ -609,13 +625,13 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
                   >
                     {elections.map(election => (
                       <option key={election.id} value={election.id}>
-                        {election.title} — {election.constituency || 'General Constituency'}
+                        {election.title}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                {/* Candidate Name & Party */}
+                {/* Candidate Name, Party & Date of Birth */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.2rem' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.4rem' }}>
@@ -633,6 +649,27 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
                         style={{ paddingLeft: '2.5rem' }}
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.4rem' }}>
+                      Candidate Date of Birth (DOB) * <span style={{ color: '#fb923c' }}>(Minimum 25 years required)</span>
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <Calendar size={18} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-dim)' }} />
+                      <input 
+                        type="date" 
+                        required
+                        value={candidateDob}
+                        max={new Date(new Date().setFullYear(new Date().getFullYear() - 25)).toISOString().split('T')[0]}
+                        onChange={(e) => setCandidateDob(e.target.value)}
+                        className="input-control"
+                        style={{ paddingLeft: '2.5rem' }}
+                      />
+                    </div>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginTop: '0.25rem', display: 'block' }}>
+                      Constitutional Requirement: Must be 25 years or older to contest an election.
+                    </span>
                   </div>
 
                   <div>
@@ -709,7 +746,7 @@ export const CandidateRegister: React.FC<CandidateRegisterProps> = ({ onSuccess 
                     style={{ marginTop: '0.2rem', cursor: 'pointer' }}
                   />
                   <label htmlFor="declarationCheck" style={{ fontSize: '0.82rem', color: '#e2e8f0', lineHeight: 1.5, cursor: 'pointer' }}>
-                    I hereby solemnly affirm that I am an accredited elector (EPIC: <strong>{user?.epicNumber || 'VERIFIED'}</strong>) and legally eligible to contest this democratic election.
+                    I hereby solemnly affirm that I am an accredited elector (EPIC: <strong>{user?.epicNumber || 'VERIFIED'}</strong>) and legally eligible (at least 25 years of age) to contest this democratic election.
                   </label>
                 </div>
 

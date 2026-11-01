@@ -48,6 +48,20 @@ public class UserService {
             throw new RuntimeException("Email is already registered with Election Commission.");
         }
 
+        // Requirement: Voter must be at least 18 years of age
+        if (request.getDob() == null || request.getDob().trim().isBlank()) {
+            throw new RuntimeException("Eligibility Error: Date of birth is mandatory. Elector must be at least 18 years of age to register.");
+        }
+        try {
+            java.time.LocalDate birthDate = java.time.LocalDate.parse(request.getDob().trim());
+            int age = java.time.Period.between(birthDate, java.time.LocalDate.now()).getYears();
+            if (age < 18) {
+                throw new RuntimeException("Electoral Eligibility Error: You must be at least 18 years of age to register and participate in voting. Current age: " + age + " years.");
+            }
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new RuntimeException("Invalid Date of Birth format. Please provide a valid date in YYYY-MM-DD format.");
+        }
+
         // Auto-generate official EPIC Number for new elector
         String epic = "IND-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         Role assignedRole = Role.VOTER;

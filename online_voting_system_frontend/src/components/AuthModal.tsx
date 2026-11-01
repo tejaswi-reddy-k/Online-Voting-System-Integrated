@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore';
 import { apiService } from '../services/api';
 import { ShieldCheck, Mail, Lock, User, Calendar, X, CheckCircle2, AlertTriangle, Key, ShieldAlert } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { calculateAge } from '../types';
 
 export const AuthModal: React.FC = () => {
   const { authModalOpen, authModalMode, closeAuthModal, setAuth, setActiveTab, addEmailNotification } = useStore();
@@ -53,6 +54,17 @@ export const AuthModal: React.FC = () => {
           return;
         }
 
+        // Strict requirement: Voter must be at least 18 years of age
+        const voterAge = calculateAge(dob);
+        if (voterAge < 18) {
+          setLoading(false);
+          setStatusMsg({
+            type: 'error',
+            text: `Electoral Ineligibility: You must be at least 18 years of age to register and vote (Current age: ${voterAge} years).`
+          });
+          return;
+        }
+
         // Strict requirement: Registration inputs: name, dob, email, password only
         const generatedEpic = 'IND-' + Math.random().toString(36).substring(2, 10).toUpperCase();
 
@@ -73,7 +85,6 @@ export const AuthModal: React.FC = () => {
             fullName: (signinRes && signinRes.fullName) || res.fullName || fullName,
             dob,
             epicNumber: (signinRes && signinRes.epicNumber) || res.epicNumber || generatedEpic,
-            constituency: (signinRes && signinRes.constituency) || '',
             role: 'ROLE_VOTER' as const,
             isVerified: true
           };
@@ -87,7 +98,6 @@ export const AuthModal: React.FC = () => {
             fullName,
             dob,
             epicNumber: generatedEpic,
-            constituency: 'General Parliamentary Constituency',
             role: 'ROLE_VOTER' as const,
             isVerified: true
           };
@@ -126,7 +136,6 @@ export const AuthModal: React.FC = () => {
             fullName: res.fullName || 'Ramesh Kumar Sharma',
             dob: '1995-08-15',
             epicNumber: res.epicNumber || 'WXJ1234567',
-            constituency: res.constituency || 'General Parliamentary Constituency',
             role: 'ROLE_VOTER' as const,
             isVerified: true
           };
@@ -139,7 +148,6 @@ export const AuthModal: React.FC = () => {
             fullName: fullName || 'Ramesh Kumar Sharma',
             dob: '1995-08-15',
             epicNumber: 'WXJ1234567',
-            constituency: 'Varanasi Parliamentary Constituency (UP-77)',
             role: 'ROLE_VOTER' as const,
             isVerified: true
           };
@@ -182,7 +190,6 @@ export const AuthModal: React.FC = () => {
           email: res.email || email,
           fullName: res.fullName || 'System Administrator',
           epicNumber: res.epicNumber || 'IND-ADM00001',
-          constituency: 'National Parliamentary HQ',
           role: 'ROLE_ADMIN' as const,
           isVerified: true
         };
@@ -193,7 +200,6 @@ export const AuthModal: React.FC = () => {
           email: email || 'admin@gmail.com',
           fullName: 'System Administrator',
           epicNumber: 'IND-ADM00001',
-          constituency: 'National Parliamentary HQ',
           role: 'ROLE_ADMIN' as const,
           isVerified: true
         };
@@ -432,7 +438,7 @@ export const AuthModal: React.FC = () => {
                 {/* 2. Date of Birth */}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
-                    Date of Birth (DOB) *
+                    Date of Birth (DOB) * <span style={{ color: '#fb923c' }}>(Minimum 18 years required)</span>
                   </label>
                   <div style={{ position: 'relative' }}>
                     <Calendar size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-dim)' }} />
@@ -440,11 +446,15 @@ export const AuthModal: React.FC = () => {
                       type="date" 
                       required
                       value={dob}
+                      max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
                       onChange={(e) => setDob(e.target.value)}
                       className="input-control"
                       style={{ paddingLeft: '2.5rem' }}
                     />
                   </div>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginTop: '0.25rem', display: 'block' }}>
+                    Legal Elector Requirement: Must be 18 years or older to participate.
+                  </span>
                 </div>
               </>
             )}

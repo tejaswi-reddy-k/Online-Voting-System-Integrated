@@ -5,7 +5,7 @@ import type { Election, Candidate } from '../types';
 import { isVoteCountLive } from '../types';
 import { 
   PlusCircle, Trash2, Edit3, Calendar, Award, Vote, Users, 
-  X, CheckCircle2, AlertTriangle, ShieldCheck, ChevronUp, MapPin, ShieldAlert
+  X, CheckCircle2, AlertTriangle, ShieldCheck, ChevronUp, ShieldAlert
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -22,7 +22,6 @@ export const AdminCenter: React.FC = () => {
 
   // Form states for Create Election (inside View & Manage Elections)
   const [title, setTitle] = useState('');
-  const [constituency, setConstituency] = useState('');
   const [description, setDescription] = useState('');
   const [startTime, setStartTime] = useState('2026-11-01T08:00');
   const [endTime, setEndTime] = useState('2026-11-10T18:00');
@@ -53,7 +52,7 @@ export const AdminCenter: React.FC = () => {
       candidatesList.push({
         name: candidate1,
         party: party1 || 'Independent',
-        manifesto: `Dedicated to citizen welfare and development in ${constituency || 'this constituency'}.`,
+        manifesto: `Dedicated to citizen welfare, transparent governance, and public service.`,
         photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=400'
       });
     }
@@ -73,8 +72,7 @@ export const AdminCenter: React.FC = () => {
     const localNewElection: Election = {
       id: newElectionId,
       title,
-      constituency: constituency || 'General Parliamentary Constituency',
-      description: description || `Official democratic ballot for ${constituency || 'General Constituency'}`,
+      description: description || `Official democratic ballot for ${title}`,
       startTime: formattedStartTime,
       endTime: formattedEndTime,
       isPublished: true,
@@ -116,7 +114,6 @@ export const AdminCenter: React.FC = () => {
 
       // Reset form
       setTitle('');
-      setConstituency('');
       setDescription('');
       setCandidate1('');
       setCandidate2('');
@@ -129,7 +126,6 @@ export const AdminCenter: React.FC = () => {
       setStatusMsg({ type: 'success', text: `Election "${title}" created and scheduled in system!` });
       confetti({ particleCount: 70, spread: 50 });
       setTitle('');
-      setConstituency('');
       setDescription('');
       setCandidate1('');
       setCandidate2('');
@@ -495,33 +491,18 @@ export const AdminCenter: React.FC = () => {
               </div>
 
               <form onSubmit={handleCreateElection} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.4rem' }}>
-                      Election Title *
-                    </label>
-                    <input 
-                      type="text" 
-                      required
-                      placeholder="e.g. 2026 Presidential Council Election"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="input-control"
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.4rem' }}>
-                      Constituency / Jurisdiction *
-                    </label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. Bangalore South Parliamentary Constituency"
-                      value={constituency}
-                      onChange={(e) => setConstituency(e.target.value)}
-                      className="input-control"
-                    />
-                  </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.4rem' }}>
+                    Election Title *
+                  </label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="e.g. 2026 Presidential Council Election"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="input-control"
+                  />
                 </div>
 
                 <div>
@@ -738,11 +719,6 @@ export const AdminCenter: React.FC = () => {
                     <span style={{ fontSize: '0.75rem', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', padding: '0.15rem 0.6rem', borderRadius: '4px', fontWeight: 600 }}>
                       ID: #{election.id}
                     </span>
-                    {election.constituency && (
-                      <span style={{ fontSize: '0.75rem', color: '#fb923c', background: 'rgba(249, 115, 22, 0.1)', padding: '0.15rem 0.6rem', borderRadius: '4px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                        <MapPin size={12} /> {election.constituency}
-                      </span>
-                    )}
                     <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                       <Calendar size={13} /> Starts: {new Date(election.startTime).toLocaleString()}
                     </span>

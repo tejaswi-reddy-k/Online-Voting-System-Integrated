@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStore } from '../store/useStore';
-import { IdCard, MapPin, CheckCircle2, ShieldCheck, Vote, Award, ExternalLink, Calendar, LogOut, Mail } from 'lucide-react';
+import { IdCard, CheckCircle2, ShieldCheck, Vote, Award, ExternalLink, Calendar, LogOut, Mail } from 'lucide-react';
+import { calculateAge } from '../types';
 
 export const VoterProfile: React.FC = () => {
   const { user, voteHistory, logout, setActiveTab, setSelectedStatusFilter, openEmailModal, emailNotifications } = useStore();
@@ -115,22 +116,22 @@ export const VoterProfile: React.FC = () => {
               </div>
             </div>
 
-            <div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                <MapPin size={13} color="#38bdf8" /> Constituency
-              </div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 600, marginTop: '0.2rem' }}>
-                {user.constituency || 'Varanasi (UP-77)'}
-              </div>
-            </div>
-
-            {user.dob && (
+            {user.dob ? (
               <div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <Calendar size={13} color="#4ade80" /> Date of Birth
+                  <Calendar size={13} color="#4ade80" /> Date of Birth & Age
                 </div>
                 <div style={{ fontSize: '0.95rem', fontWeight: 600, marginTop: '0.2rem' }}>
-                  {user.dob}
+                  {user.dob} ({calculateAge(user.dob)} yrs • Eligible Elector)
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <ShieldCheck size={13} color="#4ade80" /> Electoral Eligibility
+                </div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 600, marginTop: '0.2rem', color: '#4ade80' }}>
+                  Verified Adult Citizen (18+)
                 </div>
               </div>
             )}

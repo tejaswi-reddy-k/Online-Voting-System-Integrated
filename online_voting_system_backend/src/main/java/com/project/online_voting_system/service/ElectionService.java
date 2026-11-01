@@ -24,7 +24,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -149,6 +151,37 @@ public class ElectionService {
             }
         }
 
+        // Requirement: Candidate must be at least 25 years of age to participate/contest in elections
+        Integer candidateAge = null;
+        if (request.getDob() != null && !request.getDob().trim().isBlank()) {
+            try {
+                LocalDate birthDate = LocalDate.parse(request.getDob().trim());
+                candidateAge = Period.between(birthDate, LocalDate.now()).getYears();
+                if (candidateAge < 25) {
+                    throw new RuntimeException("Constitutional Candidacy Ineligibility: Candidates must be at least 25 years of age to participate in elections. Current candidate age: " + candidateAge + " years.");
+                }
+            } catch (java.time.format.DateTimeParseException e) {
+                throw new RuntimeException("Invalid Date of Birth format for candidate (YYYY-MM-DD required).");
+            }
+        } else if (request.getAge() != null) {
+            candidateAge = request.getAge();
+            if (candidateAge < 25) {
+                throw new RuntimeException("Constitutional Candidacy Ineligibility: Candidates must be at least 25 years of age to participate in elections. Current candidate age: " + candidateAge + " years.");
+            }
+        } else {
+            // Check actor user's DOB if nominating
+            User actorUser = (actorEmail != null) ? userRepository.findByEmail(actorEmail).orElse(null) : null;
+            if (actorUser != null && actorUser.getDob() != null && !actorUser.getDob().isBlank()) {
+                try {
+                    LocalDate birthDate = LocalDate.parse(actorUser.getDob().trim());
+                    candidateAge = Period.between(birthDate, LocalDate.now()).getYears();
+                    if (candidateAge < 25) {
+                        throw new RuntimeException("Constitutional Candidacy Ineligibility: Candidates must be at least 25 years of age to participate in elections. Current candidate age: " + candidateAge + " years.");
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+
         Candidate candidate = new Candidate(
                 request.getName(),
                 request.getParty(),
@@ -158,6 +191,8 @@ public class ElectionService {
                         : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
                 election
         );
+        candidate.setDob(request.getDob());
+        candidate.setAge(candidateAge);
 
         String txnId = (request.getPaymentTransactionId() != null && !request.getPaymentTransactionId().isBlank())
                 ? request.getPaymentTransactionId()
@@ -224,8 +259,19 @@ public class ElectionService {
             user = !allUsers.isEmpty() ? allUsers.get(0) : null;
         }
         if (user == null) {
-            user = new User("voter@gmail.com", "$2a$10$wK1V.Z...", "Registered Elector", "IND-VOT00001", "Constituency 1", Role.VOTER, true);
+            user = new User("voter@gmail.com", "$2a$10$wK1V.Z...", "Registered Elector", "IND-VOT00001", null, Role.VOTER, true);
             user = userRepository.save(user);
+        }
+
+        // Requirement: Voter must be at least 18 years of age to cast an electronic ballot
+        if (user.getDob() != null && !user.getDob().trim().isBlank()) {
+            try {
+                LocalDate birthDate = LocalDate.parse(user.getDob().trim());
+                int age = Period.between(birthDate, LocalDate.now()).getYears();
+                if (age < 18) {
+                    throw new RuntimeException("Electoral Eligibility Error: Voter must be at least 18 years of age to participate in voting. Current age: " + age + " years.");
+                }
+            } catch (Exception ignored) {}
         }
 
         Election election = null;
@@ -259,15 +305,12 @@ public class ElectionService {
             election = electionRepository.save(election);
         }
 
-        // Support re-voting / vote replacement for demo testing
+        // Strict Requirement: Voter CANNOT cast duplicate votes or vote multiple times
         Optional<Vote> existingVote = voteRepository.findByUserIdAndElectionId(user.getId(), election.getId());
-        existingVote.ifPresent(v -> {
-            if (v.getCandidate() != null && v.getCandidate().getVoteCount() > 0) {
-                v.getCandidate().setVoteCount(v.getCandidate().getVoteCount() - 1);
-                candidateRepository.save(v.getCandidate());
-            }
-            voteRepository.delete(v);
-        });
+        if (existingVote.isPresent()) {
+            throw new RuntimeException("Duplicate Vote Prohibited: You have already cast your electronic ballot for election ID " 
+                    + election.getId() + " (\"" + election.getTitle() + "\"). Multiple or duplicate voting is strictly prohibited.");
+        }
 
         Candidate candidate = null;
         if (request.getCandidateId() != null) {

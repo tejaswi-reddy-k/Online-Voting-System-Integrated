@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { apiService } from '../services/api';
 import type { Election, Candidate } from '../types';
-import { getElectionStatus } from '../types';
+import { getElectionStatus, calculateAge } from '../types';
 import { 
   CheckCircle2, Calendar, AlertTriangle, ArrowRight, 
-  MapPin, Radio, Award, BarChart3, Clock, ShieldCheck, Mail, Trophy, Sparkles,
+  Radio, Award, BarChart3, Clock, ShieldCheck, Mail, Trophy, Sparkles,
   Edit3, LogOut
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -18,7 +18,7 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
   const { 
     user, isAuthenticated, token, 
     activeReceipt, setActiveReceipt, setActiveTab, setSelectedElectionId,
-    openAuthModal, addVoteHistory, recordVote, addEmailNotification, openEmailModal,
+    openAuthModal, addVoteHistory, voteHistory, recordVote, addEmailNotification, openEmailModal,
     setElections, deleteCandidate 
   } = useStore();
 
@@ -30,6 +30,9 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
   const [resultsEmailSent, setResultsEmailSent] = useState(false);
 
   const status = getElectionStatus(election);
+  const userHasVoted = hasVoted || (voteHistory || []).some(r => r.electionId === election.id);
+  const voterAge = user?.dob ? calculateAge(user.dob) : 18;
+  const isUnderAge = user?.dob ? voterAge < 18 : false;
 
   const handleExitFromCard = async (e: React.MouseEvent, candId: number, candName: string) => {
     e.stopPropagation();
@@ -53,6 +56,16 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
   const handleVoteSubmit = async () => {
     if (!isAuthenticated || !user) {
       openAuthModal('voter');
+      return;
+    }
+
+    if (userHasVoted) {
+      setErrorMsg("Duplicate Voting Prohibited: You have already cast your electronic ballot for this election. Multiple or duplicate voting is strictly forbidden.");
+      return;
+    }
+
+    if (isUnderAge) {
+      setErrorMsg(`Electoral Ineligibility: You must be at least 18 years of age to participate in voting. Your calculated age is ${voterAge} years.`);
       return;
     }
 
@@ -136,7 +149,7 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
       to: targetEmail,
       subject: `Official Certified Election Results - ${election.title}`,
       preview: `Official results certified: ${winner?.name} declared winner with ${winner?.voteCount.toLocaleString()} votes.`,
-      body: `Official Certified Election Results\n========================================\nElection: ${election.title}\nTerritorial Jurisdiction: ${election.constituency || 'General Constituency'}\nAudit Status: COMPLETED & CERTIFIED\n\nDECLARED WINNER:\n----------------------------------------\n• Winning Candidate: ${winner?.name || 'N/A'}\n• Political Party: ${winner?.party || 'N/A'}\n• Total Votes Secured: ${winner?.voteCount.toLocaleString() || 0} (${winnerPercentage}% of ${totalVotes.toLocaleString()} total votes cast)\n\nFULL CANDIDATE TALLY BREAKDOWN:\n----------------------------------------\n` +
+      body: `Official Certified Election Results\n========================================\nElection: ${election.title}\nAudit Status: COMPLETED & CERTIFIED\n\nDECLARED WINNER:\n----------------------------------------\n• Winning Candidate: ${winner?.name || 'N/A'}\n• Political Party: ${winner?.party || 'N/A'}\n• Total Votes Secured: ${winner?.voteCount.toLocaleString() || 0} (${winnerPercentage}% of ${totalVotes.toLocaleString()} total votes cast)\n\nFULL CANDIDATE TALLY BREAKDOWN:\n----------------------------------------\n` +
         sortedCandidates.map((c, i) => `${i + 1}. ${c.name} (${c.party}) — ${c.voteCount.toLocaleString()} votes (${totalVotes > 0 ? ((c.voteCount / totalVotes) * 100).toFixed(1) : 0}%)\n`).join('') +
         `\nThank you for participating in the sovereign democratic process.\nElection Commission of India`
     });
@@ -257,12 +270,6 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.6rem', flexWrap: 'wrap' }}>
             {statusBadge()}
-
-            {election.constituency && (
-              <span style={{ fontSize: '0.8rem', color: '#fb923c', display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(249, 115, 22, 0.1)', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 600 }}>
-                <MapPin size={13} /> {election.constituency}
-              </span>
-            )}
 
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               Election #{election.id}
@@ -933,21 +940,28 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
               </div>
             )}
 
-            {!hasVoted ? (
+            {!userHasVoted ? (
               isAuthenticated ? (
-                <button 
-                  onClick={handleVoteSubmit}
-                  disabled={submitting || !selectedCandidateId}
-                  className="btn-primary"
-                  style={{
-                    padding: '0.75rem 1.8rem',
-                    fontSize: '0.92rem',
-                    background: selectedCandidateId ? 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' : 'rgba(255,255,255,0.08)'
-                  }}
-                >
-                  {submitting ? 'Recording Electronic Ballot...' : 'Confirm & Cast Electronic Vote'}
-                  <ArrowRight size={16} />
-                </button>
+                isUnderAge ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ef4444', fontSize: '0.88rem', fontWeight: 600 }}>
+                    <AlertTriangle size={16} />
+                    <span>Ineligible to Vote: Must be at least 18 years of age (Your Age: {voterAge} years).</span>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={handleVoteSubmit}
+                    disabled={submitting || !selectedCandidateId}
+                    className="btn-primary"
+                    style={{
+                      padding: '0.75rem 1.8rem',
+                      fontSize: '0.92rem',
+                      background: selectedCandidateId ? 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' : 'rgba(255,255,255,0.08)'
+                    }}
+                  >
+                    {submitting ? 'Recording Electronic Ballot...' : 'Confirm & Cast Electronic Vote'}
+                    <ArrowRight size={16} />
+                  </button>
+                )
               ) : (
                 <button 
                   onClick={() => openAuthModal('voter')}
@@ -958,13 +972,19 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election }) => {
                 </button>
               )
             ) : (
-              <button 
-                onClick={() => setActiveTab('verify')}
-                className="btn-secondary"
-                style={{ fontSize: '0.88rem' }}
-              >
-                Verify Digital Ballot Receipt
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.82rem', color: '#4ade80', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <CheckCircle2 size={15} color="#4ade80" />
+                  Electronic Ballot Cast • Duplicate Voting Prohibited
+                </span>
+                <button 
+                  onClick={() => setActiveTab('verify')}
+                  className="btn-secondary"
+                  style={{ fontSize: '0.88rem' }}
+                >
+                  Verify Digital Ballot Receipt
+                </button>
+              </div>
             )}
           </>
         )}

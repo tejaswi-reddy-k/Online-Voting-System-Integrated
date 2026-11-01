@@ -36,6 +36,10 @@ public class Candidate {
 
     private Double securityDepositAmount = 25.00;
 
+    private String dob;
+
+    private Integer age;
+
     public Candidate() {
     }
 
@@ -136,5 +140,21 @@ public class Candidate {
 
     public void setSecurityDepositAmount(Double securityDepositAmount) {
         this.securityDepositAmount = securityDepositAmount;
+    }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 }

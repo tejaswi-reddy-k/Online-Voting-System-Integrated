@@ -4,7 +4,7 @@ import type { ElectionResults } from '../types';
 import { getElectionStatus, isVoteCountLive } from '../types';
 import { useStore } from '../store/useStore';
 import { 
-  BarChart3, Users, Award, CheckCircle, MapPin, Radio, Zap,
+  BarChart3, Users, Award, CheckCircle, Radio, Zap,
   Clock, Lock, ArrowRight, Trophy, Sparkles
 } from 'lucide-react';
 
@@ -206,7 +206,7 @@ export const LiveResults: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Zap size={16} color="#fb923c" />
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>Select Ballot Constituency:</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>Select Election:</span>
           </div>
           <select 
             value={currentElection.id}
@@ -371,10 +371,10 @@ export const LiveResults: React.FC = () => {
 
               <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.2rem', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <MapPin size={16} /> Territorial Constituency
+                  <Award size={16} color="#38bdf8" /> Official Election
                 </div>
                 <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '0.5rem', color: '#38bdf8' }}>
-                  {currentElection.constituency || "General Parliamentary Seat"}
+                  {currentElection.title}
                 </div>
               </div>
 

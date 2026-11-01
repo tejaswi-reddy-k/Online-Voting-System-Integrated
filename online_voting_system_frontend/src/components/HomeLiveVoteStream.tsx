@@ -253,7 +253,7 @@ export const HomeLiveVoteStream: React.FC<HomeLiveVoteStreamProps> = ({ election
         <div>
           <div style={{ marginBottom: '1.2rem' }}>
             <div style={{ fontSize: '0.8rem', color: shouldStreamNow ? '#f87171' : '#fb923c', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              {currentElection.constituency || 'Constituency Live Feed'}
+              Electoral Live Feed
             </div>
             <h3 style={{ fontSize: '1.35rem', fontWeight: 800, marginTop: '0.2rem', marginBottom: '0.4rem' }}>
               {currentElection.title}
