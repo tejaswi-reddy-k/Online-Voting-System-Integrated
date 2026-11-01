@@ -170,7 +170,7 @@ public class ElectionService {
             }
         } else {
             // Check actor user's DOB if nominating
-            User actorUser = (actorEmail != null) ? userRepository.findByEmail(actorEmail).orElse(null) : null;
+            User actorUser = (userEmail != null) ? userRepository.findByEmail(userEmail).orElse(null) : null;
             if (actorUser != null && actorUser.getDob() != null && !actorUser.getDob().isBlank()) {
                 try {
                     LocalDate birthDate = LocalDate.parse(actorUser.getDob().trim());
